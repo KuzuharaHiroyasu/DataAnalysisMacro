@@ -1,4 +1,7 @@
 Attribute VB_Name = "Read"
+'
+'データ読み込み
+'
 Sub readData()
     Dim ret As Boolean
     Dim msg As String
@@ -47,7 +50,9 @@ Sub readData()
     MsgBox msg
 End Sub
 
-
+'
+'データテキスト読み込み
+'
 Private Function readText(ByVal fileName As String, ByVal inputRow As Long) As Boolean
     Dim a
     Dim inputLine As Long
@@ -69,8 +74,121 @@ Private Function readText(ByVal fileName As String, ByVal inputRow As Long) As B
     End If
 End Function
 
+'
+'加速度センサー値の絶対値
+'
 Sub absoluteValue(ByVal x As Integer, ByVal y As Integer, ByVal z As Integer)
     x = Abs(x)
     y = Abs(y)
     z = Abs(z)
 End Sub
+
+'
+'体の向きを決める
+'
+Sub acceAnalysis()
+    Dim x As Integer                    '加速度センサー_X軸'
+    Dim y As Integer                    '加速度センサー_Y軸'
+    Dim z As Integer                    '加速度センサー_Z軸'
+    Dim line As Long
+    Dim x_abs As Integer
+    Dim z_abs As Integer
+    
+    line = constInitDataLine
+    
+    While IsEmpty(Sheets(constDataSheetName).Cells(line, constAcceXRow)) = False
+        x = Sheets(constDataSheetName).Cells(line, constAcceXRow).Value
+        y = Sheets(constDataSheetName).Cells(line, constAcceYRow).Value
+        z = Sheets(constDataSheetName).Cells(line, constAcceZRow).Value
+        
+        x_abs = Abs(x)
+        z_abs = Abs(z)
+        
+        'ヘッド部の場所（体の向きではない）'
+        If 0 <= x Then
+            '右側'
+            If 0 <= z Then
+                '上側'
+                If x_abs < z_abs Then
+                    If (z_abs - x_abs) < 10 Then
+                        '右上(確)'
+                        Sheets(constDataSheetName).Cells(line, constRetAcceRow).Value = 7
+                    Else
+                        '上(確)'
+                        Sheets(constDataSheetName).Cells(line, constRetAcceRow).Value = 7
+                    End If
+                Else
+                    If (x_abs - z_abs) < 10 Then
+                        '右上(確)'
+                        Sheets(constDataSheetName).Cells(line, constRetAcceRow).Value = 7
+                    Else
+                        '右(確)'
+                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 1).Value = 6
+                    End If
+                End If
+            Else
+                '下側'
+                If x_abs < z_abs Then
+                    If (z_abs - x_abs) < 10 Then
+                        '右下(確)'
+                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 2).Value = 5
+                    Else
+                        '下(確)'
+                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 3).Value = 4
+                    End If
+                Else
+                    If (x_abs - z_abs) < 10 Then
+                        '右下(確)'
+                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 2).Value = 5
+                    Else
+                        '右(確)'
+                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 2).Value = 5
+                    End If
+                End If
+            End If
+        Else
+            '左側'
+            If 0 <= z Then
+                '上側'
+                If x_abs < z_abs Then
+                    If (z_abs - x_abs) < 10 Then
+                        '左上(確)'
+                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 6).Value = 1
+                    Else
+                        '上(確)'
+                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 7).Value = 0
+                    End If
+                Else
+                    If (x_abs - z_abs) < 10 Then
+                        '左上(確)'
+                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 6).Value = 1
+                    Else
+                        '左(確)'
+                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 6).Value = 1
+                    End If
+                End If
+            Else
+                '下側'
+                If x_abs < z_abs Then
+                    If (z_abs - x_abs) < 10 Then
+                        '左下(確)'
+                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 4).Value = 3
+                    Else
+                        '下(確)'
+                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 4).Value = 3
+                    End If
+                Else
+                    If (x_abs - z_abs) < 10 Then
+                        '左下(確)'
+                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 4).Value = 3
+                    Else
+                        '左(確)'
+                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 5).Value = 2
+                    End If
+                End If
+            End If
+        End If
+        line = line + 1
+    Wend
+End Sub
+

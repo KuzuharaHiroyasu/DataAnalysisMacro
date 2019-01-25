@@ -1,5 +1,19 @@
 Attribute VB_Name = "Analysis"
 '
+'各向きの時間用構造体
+'
+Type directionTime
+    up As Integer
+    rightUp As Integer
+    right As Integer
+    rightDown As Integer
+    down As Integer
+    leftDown As Integer
+    left As Integer
+    leftUp As Integer
+End Type
+
+'
 'データ解析
 '
 Sub dataAnalysis()
@@ -8,6 +22,9 @@ Sub dataAnalysis()
     Dim beforeSnoreState As Integer     '１つ前のいびき判定状態'
     Dim beforeApneaState As Integer     '１つ前の無呼吸判定状態'
     Dim time As Integer                 '経過時間(秒)'
+    Dim breathTime As Integer           '通常呼吸時間'
+    Dim snoreTime As Integer            'いびき時間'
+    Dim apneaTime As Integer            '無呼吸時間'
     Dim snoreCnt As Integer             'いびき回数'
     Dim apneaCnt As Integer             '無呼吸回数'
     Dim startTime As Date               '開始時刻'
@@ -15,11 +32,17 @@ Sub dataAnalysis()
     Dim retLine As Long                 '現在結果入力中の行'
     Dim no As Long                      'ナンバー'
     Dim remark As Long                  '備考用'
+    Dim breath As directionTime         '通常呼吸の向き構造体'
+    Dim snore As directionTime          'いびきの向き構造体'
+    Dim apnea As directionTime          '無呼吸の向き構造体'
     
     ''''''初期化''''''
     snoreState = 0
     apneaState = 0
     time = 0
+    breathTime = 0
+    snoreTime = 0
+    apneaTime = 0
     snoreCnt = 0
     apneaCnt = 0
     no = 0
@@ -56,7 +79,7 @@ Sub dataAnalysis()
             End If
             
             'いびきのトータル時間'
-            
+            snoreTime = snoreTime + 10
         ElseIf apneaState = 1 Or apneaState = 2 Then
         '無呼吸判定あり'
             If beforeSnoreState = 1 Then
@@ -73,8 +96,7 @@ Sub dataAnalysis()
             End If
             
             '無呼吸のトータル時間'
-            
-            
+            apneaTime = apneaTime + 10
         Else
             If beforeApneaState = 1 Or beforeApneaState = 2 Or beforeSnoreState = 1 Then
             '１つ前で無呼吸判定あり、もしくはいびき判定ありだった'
@@ -83,7 +105,7 @@ Sub dataAnalysis()
             End If
             
             '通常呼吸のトータル時間'
-            
+            breathTime = breathTime + 10
         End If
         
         no = no + 1
@@ -106,9 +128,6 @@ Sub dataAnalysis()
     
     
     ''''''加速度センサー''''''
-    '向き'
-    Call acceAnalysis
-    
     Dim endLine As Long
     Dim i As Long
     i = 1
@@ -129,6 +148,7 @@ Sub dataAnalysis()
     If Sheets(constRetSheetName).ChartObjects.Count > 0 Then
         Sheets(constRetSheetName).ChartObjects.Delete
     End If
+    'グラフ作成'
     Call createGraph(endLine)
     
     MsgBox "完了しました。"
@@ -159,114 +179,6 @@ Sub setEnd(ByVal retLine As Long, ByVal startTime As Date, ByVal time As Long)
     End If
 End Sub
 
-'
-'体の向きを決める
-'
-Sub acceAnalysis()
-    Dim x As Integer                    '加速度センサー_X軸'
-    Dim y As Integer                    '加速度センサー_Y軸'
-    Dim z As Integer                    '加速度センサー_Z軸'
-    Dim line As Long
-    Dim x_abs As Integer
-    Dim z_abs As Integer
-    
-    line = constInitDataLine
-    
-    While IsEmpty(Sheets(constDataSheetName).Cells(line, constAcceXRow)) = False
-        x = Sheets(constDataSheetName).Cells(line, constAcceXRow).Value
-        y = Sheets(constDataSheetName).Cells(line, constAcceYRow).Value
-        z = Sheets(constDataSheetName).Cells(line, constAcceZRow).Value
-        
-        x_abs = Abs(x)
-        z_abs = Abs(z)
-        
-        'ヘッド部の場所（体の向きではない）'
-        If 0 <= x Then
-            '右側'
-            If 0 <= z Then
-                '上側'
-                If x_abs < z_abs Then
-                    If (z_abs - x_abs) < 10 Then
-                        '右上(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow).Value = 7
-                    Else
-                        '上(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow).Value = 7
-                    End If
-                Else
-                    If (x_abs - z_abs) < 10 Then
-                        '右上(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow).Value = 7
-                    Else
-                        '右(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 1).Value = 6
-                    End If
-                End If
-            Else
-                '下側'
-                If x_abs < z_abs Then
-                    If (z_abs - x_abs) < 10 Then
-                        '右下(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 2).Value = 5
-                    Else
-                        '下(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 3).Value = 4
-                    End If
-                Else
-                    If (x_abs - z_abs) < 10 Then
-                        '右下(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 2).Value = 5
-                    Else
-                        '右(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 2).Value = 5
-                    End If
-                End If
-            End If
-        Else
-            '左側'
-            If 0 <= z Then
-                '上側'
-                If x_abs < z_abs Then
-                    If (z_abs - x_abs) < 10 Then
-                        '左上(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 6).Value = 1
-                    Else
-                        '上(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 7).Value = 0
-                    End If
-                Else
-                    If (x_abs - z_abs) < 10 Then
-                        '左上(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 6).Value = 1
-                    Else
-                        '左(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 6).Value = 1
-                    End If
-                End If
-            Else
-                '下側'
-                If x_abs < z_abs Then
-                    If (z_abs - x_abs) < 10 Then
-                        '左下(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 4).Value = 3
-                    Else
-                        '下(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 4).Value = 3
-                    End If
-                Else
-                    If (x_abs - z_abs) < 10 Then
-                        '左下(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 4).Value = 3
-                    Else
-                        '左(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 5).Value = 2
-                    End If
-                End If
-            End If
-        End If
-        line = line + 1
-    Wend
-End Sub
 
 '
 '移動平均を求める
@@ -316,7 +228,7 @@ Sub createGraph(ByVal endLine As Long)
             .ChartArea.Width = 36000
             .ChartArea.Height = 150
             .ChartArea.Top = Sheets(constRetSheetName).Range("H7").Top
-            .ChartArea.Left = Sheets(constRetSheetName).Range("H7").Left
+            .ChartArea.left = Sheets(constRetSheetName).Range("H7").left
             .SeriesCollection(1).Name = "=""いびき"""
             .SeriesCollection(2).Name = "=""呼吸音"""
             .Axes(xlValue).MinimumScale = 0
@@ -335,7 +247,7 @@ Sub createGraph(ByVal endLine As Long)
             .ChartArea.Width = 36000
             .ChartArea.Height = 150
             .ChartArea.Top = Sheets(constRetSheetName).Range("H19").Top
-            .ChartArea.Left = Sheets(constRetSheetName).Range("H19").Left
+            .ChartArea.left = Sheets(constRetSheetName).Range("H19").left
             .SeriesCollection(1).Name = "=""いびき"""
             .SeriesCollection(2).Name = "=""無呼吸"""
             .Axes(xlValue).MinimumScale = 0
@@ -354,7 +266,7 @@ Sub createGraph(ByVal endLine As Long)
             .ChartArea.Width = 36000
             .ChartArea.Height = 150
             .ChartArea.Top = Sheets(constRetSheetName).Range("H31").Top
-            .ChartArea.Left = Sheets(constRetSheetName).Range("H31").Left
+            .ChartArea.left = Sheets(constRetSheetName).Range("H31").left
             .SeriesCollection(1).Name = "=""上"""
             .SeriesCollection(2).Name = "=""右上"""
             .SeriesCollection(3).Name = "=""右"""
@@ -379,7 +291,7 @@ Sub createGraph(ByVal endLine As Long)
             .ChartArea.Width = 36000
             .ChartArea.Height = 150
             .ChartArea.Top = Sheets(constRetSheetName).Range("H43").Top
-            .ChartArea.Left = Sheets(constRetSheetName).Range("H43").Left
+            .ChartArea.left = Sheets(constRetSheetName).Range("H43").left
             .SeriesCollection(1).Name = "=""Ｘ軸"""
             .SeriesCollection(2).Name = "=""Ｙ軸"""
             .SeriesCollection(3).Name = "=""Ｚ軸"""
@@ -392,7 +304,19 @@ Sub createGraph(ByVal endLine As Long)
     End If
 End Sub
 
+Sub setDirectionTime()
 
+    Select Case str
+        Case "小学生"
+            MsgBox "小学生です"
+        Case "中学生"
+            MsgBox "中学生です"
+        Case "高校生"
+            MsgBox "高校生です"
+        Case Else
+            MsgBox "入力が不正です"
+    End Select
+End Sub
 
 
 
