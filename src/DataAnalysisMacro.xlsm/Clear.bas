@@ -3,27 +3,27 @@ Sub Clear()
     Dim cnt As Long
     
     'グラフ削除'
-    If Sheets(retSheetName).ChartObjects.Count > 0 Then
-        Sheets(retSheetName).ChartObjects.Delete
+    If Sheets(constRetSheetName).ChartObjects.Count > 0 Then
+        Sheets(constRetSheetName).ChartObjects.Delete
     End If
     
     'データシート'
     cnt = 2 '2行目から'
-    While IsEmpty(Sheets(dataSheetName).Cells(cnt, rawRow)) = False
-        Sheets(dataSheetName).Rows(cnt).Clear
+    While IsEmpty(Sheets(constDataSheetName).Cells(cnt, constRawRow)) = False
+        Sheets(constDataSheetName).Rows(cnt).Clear
         cnt = cnt + 1
     Wend
     
     '結果シート'
-    Sheets(retSheetName).Rows(3).Clear
-'    Sheets(retSheetName).Range("C3").Clear
-'    Sheets(retSheetName).Range("D3").Clear
-'    Sheets(retSheetName).Range("E3").Clear
-'    Sheets(retSheetName).Range("F3").Clear
+    Sheets(constRetSheetName).Rows(3).Clear
+'    Sheets(constRetSheetName).Range("C3").Clear
+'    Sheets(constRetSheetName).Range("D3").Clear
+'    Sheets(constRetSheetName).Range("E3").Clear
+'    Sheets(constRetSheetName).Range("F3").Clear
 
     cnt = 44    '44行目から'
-    While IsEmpty(Sheets(retSheetName).Cells(cnt, retStartTimeRow)) = False
-        Sheets(retSheetName).Rows(cnt).Clear
+    While IsEmpty(Sheets(constRetSheetName).Cells(cnt, constRetStartTimeRow)) = False
+        Sheets(constRetSheetName).Rows(cnt).Clear
         cnt = cnt + 1
     Wend
     

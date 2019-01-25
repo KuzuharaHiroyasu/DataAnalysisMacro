@@ -14,13 +14,13 @@ Sub readData()
     End If
     
     'Ç¢Ç—Ç´èÛë‘'
-    If Not readText(ThisWorkbook.Path & "\snore__sum.txt", 5) Then
-        msg = msg + "snore__sum.txt "
+    If Not readText(ThisWorkbook.Path & "\constSnore__sum.txt", 5) Then
+        msg = msg + "constSnore__sum.txt "
     End If
     
     'ñ≥åƒãzèÛë‘'
-    If Not readText(ThisWorkbook.Path & "\apnea_sum.txt", 6) Then
-        msg = msg + "apnea_sum.txt "
+    If Not readText(ThisWorkbook.Path & "\constApnea_sum.txt", 6) Then
+        msg = msg + "constApnea_sum.txt "
     End If
     
     'Xé≤'
@@ -59,7 +59,7 @@ Private Function readText(ByVal fileName As String, ByVal inputRow As Long) As B
         Open fileName For Input As #1
         Do Until EOF(1)
             Line Input #1, buf
-            Sheets(dataSheetName).Cells(inputLine, inputRow) = buf
+            Sheets(constDataSheetName).Cells(inputLine, inputRow) = buf
             inputLine = inputLine + 1
         Loop
         Close #1
