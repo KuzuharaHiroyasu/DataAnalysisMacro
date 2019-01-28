@@ -73,7 +73,7 @@ Sub dataAnalysis()
             End If
             
             'いびきのトータル時間'
-            Call setDirectionTime(no, snore)
+            Call calculationDirectionTime(no, snore)
         ElseIf apneaState = 1 Or apneaState = 2 Then
         '無呼吸判定あり'
             If beforeSnoreState = 1 Then
@@ -90,7 +90,7 @@ Sub dataAnalysis()
             End If
             
             '無呼吸のトータル時間'
-            Call setDirectionTime(no, apnea)
+            Call calculationDirectionTime(no, apnea)
         Else
             If beforeApneaState = 1 Or beforeApneaState = 2 Or beforeSnoreState = 1 Then
             '１つ前で無呼吸判定あり、もしくはいびき判定ありだった'
@@ -99,7 +99,7 @@ Sub dataAnalysis()
             End If
             
             '通常呼吸のトータル時間'
-            Call setDirectionTime(no, breath)
+            Call calculationDirectionTime(no, breath)
         End If
         
         no = no + 1
@@ -115,18 +115,27 @@ Sub dataAnalysis()
     ''''''各種データ記入''''''
     Call setData(time, startTime, snoreCnt, apneaCnt)
     
+    '通常呼吸'
+    Call setDirectionTime(breath, 9, 3)
+    
+    'いびき'
+    Call setDirectionTime(snore, 14, 3)
+    
+    '無呼吸'
+    Call setDirectionTime(apnea, 19, 3)
+    
     ''''''加速度センサー''''''
     Dim endLine As Long
     Dim i As Long
     i = 1
     
     '向き判定の最終行'
-    endLine = Sheets(constDataSheetName).Cells(rows.Count, constRetAcceRow).End(xlUp).Row
+    endLine = Sheets(constDataSheetName).Cells(rows.Count, constRetAcceRow).End(xlUp).row
     
     '最終の向きの行数検索'
     While i <= 7
-        If endLine <= Sheets(constDataSheetName).Cells(rows.Count, constRetAcceRow + i).End(xlUp).Row Then
-            endLine = Sheets(constDataSheetName).Cells(rows.Count, constRetAcceRow + i).End(xlUp).Row
+        If endLine <= Sheets(constDataSheetName).Cells(rows.Count, constRetAcceRow + i).End(xlUp).row Then
+            endLine = Sheets(constDataSheetName).Cells(rows.Count, constRetAcceRow + i).End(xlUp).row
         End If
         i = i + 1
     Wend
@@ -202,6 +211,42 @@ Sub setData(ByVal time As Long, ByVal startTime As Date, ByVal snoreCnt As Integ
     
     '無呼吸回数'
     Sheets(constRetSheetName).Range("F3").Value = apneaCnt
+End Sub
+
+'
+'各状態ごとの各向きの時間をセットする
+'
+Sub setDirectionTime(directTime As directionTime, ByVal line As Integer, ByVal row As Integer)
+    '上'
+    Sheets(constRetSheetName).Cells(line, row).Value = DateAdd("s", time, directTime.up)
+    row = row + 1
+    
+    '右上'
+    Sheets(constRetSheetName).Cells(line, row).Value = DateAdd("s", time, directTime.rightUp)
+    row = row + 1
+    
+    '右'
+    Sheets(constRetSheetName).Cells(line, row).Value = DateAdd("s", time, directTime.right)
+    row = row + 1
+    
+    '右下'
+    Sheets(constRetSheetName).Cells(line, row).Value = DateAdd("s", time, directTime.rightDown)
+    row = row + 1
+    
+    '下'
+    Sheets(constRetSheetName).Cells(line, row).Value = DateAdd("s", time, directTime.down)
+    row = row + 1
+    
+    '左下'
+    Sheets(constRetSheetName).Cells(line, row).Value = DateAdd("s", time, directTime.leftDown)
+    row = row + 1
+    
+    '左'
+    Sheets(constRetSheetName).Cells(line, row).Value = DateAdd("s", time, directTime.left)
+    row = row + 1
+    
+    '左上'
+    Sheets(constRetSheetName).Cells(line, row).Value = DateAdd("s", time, directTime.leftUp)
 End Sub
 
 '
@@ -295,7 +340,7 @@ End Sub
 '
 '各状態ごとの各向きの時間を求める
 '
-Sub setDirectionTime(ByVal no As Long, directTime As directionTime)
+Sub calculationDirectionTime(ByVal no As Long, directTime As directionTime)
     Dim line As Long
     Dim rows As Integer
     
@@ -305,7 +350,6 @@ Sub setDirectionTime(ByVal no As Long, directTime As directionTime)
     line = (no * 20) + 20
 
     '向きを検索'
-    
     While WorksheetFunction.CountA(Sheets(constDataSheetName).Cells(line, rows)) = 0
         '空白'
         rows = rows + 1
