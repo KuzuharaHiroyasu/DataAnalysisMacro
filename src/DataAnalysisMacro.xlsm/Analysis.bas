@@ -47,7 +47,11 @@ Sub dataAnalysis()
     startTime = Sheets(constRetSheetName).Range("B3").Value
     
     ''''''解析''''''
+    Application.ScreenUpdating = False
+    Application.Calculation = xlManual
+    
     While IsEmpty(Sheets(constDataSheetName).Cells(dataLine, constSnoreStateRow)) = False
+        DoEvents
         Sheets(constDataSheetName).Cells(dataLine, constNoRow).Value = no 'ナンバー挿入'
         beforeSnoreState = snoreState                       '１つ前のいびき判定状態を保存'
         beforeApneaState = apneaState                       '１つ前の無呼吸判定状態を保存'
@@ -148,6 +152,9 @@ Sub dataAnalysis()
     'グラフ作成'
     Call createGraph(endLine)
     
+    Application.Calculation = xlAutomatic
+    Application.ScreenUpdating = True
+    
     MsgBox "完了しました。"
 End Sub
 
@@ -217,36 +224,54 @@ End Sub
 '各状態ごとの各向きの時間をセットする
 '
 Sub setDirectionTime(directTime As directionTime, ByVal line As Integer, ByVal row As Integer)
+    Dim time As Date
+
     '上'
-    Sheets(constRetSheetName).Cells(line, row).Value = DateAdd("s", time, directTime.up)
+    time = TimeSerial(0, 0, directTime.up)
+    Sheets(constRetSheetName).Cells(line, row).NumberFormatLocal = "hh:mm:ss"
+    Sheets(constRetSheetName).Cells(line, row).Value = time
     row = row + 1
     
     '右上'
-    Sheets(constRetSheetName).Cells(line, row).Value = DateAdd("s", time, directTime.rightUp)
+    time = TimeSerial(0, 0, directTime.rightUp)
+    Sheets(constRetSheetName).Cells(line, row).NumberFormatLocal = "hh:mm:ss"
+    Sheets(constRetSheetName).Cells(line, row).Value = time
     row = row + 1
     
     '右'
-    Sheets(constRetSheetName).Cells(line, row).Value = DateAdd("s", time, directTime.right)
+    time = TimeSerial(0, 0, directTime.right)
+    Sheets(constRetSheetName).Cells(line, row).NumberFormatLocal = "hh:mm:ss"
+    Sheets(constRetSheetName).Cells(line, row).Value = time
     row = row + 1
     
     '右下'
-    Sheets(constRetSheetName).Cells(line, row).Value = DateAdd("s", time, directTime.rightDown)
+    time = TimeSerial(0, 0, directTime.rightDown)
+    Sheets(constRetSheetName).Cells(line, row).NumberFormatLocal = "hh:mm:ss"
+    Sheets(constRetSheetName).Cells(line, row).Value = time
     row = row + 1
     
     '下'
-    Sheets(constRetSheetName).Cells(line, row).Value = DateAdd("s", time, directTime.down)
+    time = TimeSerial(0, 0, directTime.down)
+    Sheets(constRetSheetName).Cells(line, row).NumberFormatLocal = "hh:mm:ss"
+    Sheets(constRetSheetName).Cells(line, row).Value = time
     row = row + 1
     
     '左下'
-    Sheets(constRetSheetName).Cells(line, row).Value = DateAdd("s", time, directTime.leftDown)
+    time = TimeSerial(0, 0, directTime.leftDown)
+    Sheets(constRetSheetName).Cells(line, row).NumberFormatLocal = "hh:mm:ss"
+    Sheets(constRetSheetName).Cells(line, row).Value = time
     row = row + 1
     
     '左'
-    Sheets(constRetSheetName).Cells(line, row).Value = DateAdd("s", time, directTime.left)
+    time = TimeSerial(0, 0, directTime.left)
+    Sheets(constRetSheetName).Cells(line, row).NumberFormatLocal = "hh:mm:ss"
+    Sheets(constRetSheetName).Cells(line, row).Value = time
     row = row + 1
     
     '左上'
-    Sheets(constRetSheetName).Cells(line, row).Value = DateAdd("s", time, directTime.leftUp)
+    time = TimeSerial(0, 0, directTime.leftUp)
+    Sheets(constRetSheetName).Cells(line, row).NumberFormatLocal = "hh:mm:ss"
+    Sheets(constRetSheetName).Cells(line, row).Value = time
 End Sub
 
 '
@@ -260,8 +285,8 @@ Sub createGraph(ByVal endLine As Long)
             .SetSourceData Source:=Sheets(constDataSheetName).Range(Sheets(constDataSheetName).Cells(constInitDataLine, constRawRow), Sheets(constDataSheetName).Cells(rows.Count, constRawSnoreRow).End(xlUp))
             .ChartArea.Width = 36000
             .ChartArea.Height = 150
-            .ChartArea.Top = Sheets(constRetSheetName).Range("H7").Top
-            .ChartArea.left = Sheets(constRetSheetName).Range("H7").left
+            .ChartArea.Top = Sheets(constRetSheetName).Range("L8").Top
+            .ChartArea.left = Sheets(constRetSheetName).Range("L8").left
             .SeriesCollection(1).Name = "=""いびき"""
             .SeriesCollection(2).Name = "=""呼吸音"""
             .Axes(xlValue).MinimumScale = 0
@@ -279,8 +304,8 @@ Sub createGraph(ByVal endLine As Long)
             .SetSourceData Source:=Sheets(constDataSheetName).Range(Sheets(constDataSheetName).Cells(constInitDataLine, constSnoreStateRow), Sheets(constDataSheetName).Cells(rows.Count, constApneaStateRow).End(xlUp))
             .ChartArea.Width = 36000
             .ChartArea.Height = 150
-            .ChartArea.Top = Sheets(constRetSheetName).Range("H19").Top
-            .ChartArea.left = Sheets(constRetSheetName).Range("H19").left
+            .ChartArea.Top = Sheets(constRetSheetName).Range("L19").Top
+            .ChartArea.left = Sheets(constRetSheetName).Range("L19").left
             .SeriesCollection(1).Name = "=""いびき"""
             .SeriesCollection(2).Name = "=""無呼吸"""
             .Axes(xlValue).MinimumScale = 0
@@ -298,8 +323,8 @@ Sub createGraph(ByVal endLine As Long)
             .SetSourceData Source:=Sheets(constDataSheetName).Range(Sheets(constDataSheetName).Cells(constInitDataLine - 1, constRetAcceRow), Sheets(constDataSheetName).Cells(endLine, 17))
             .ChartArea.Width = 36000
             .ChartArea.Height = 150
-            .ChartArea.Top = Sheets(constRetSheetName).Range("H31").Top
-            .ChartArea.left = Sheets(constRetSheetName).Range("H31").left
+            .ChartArea.Top = Sheets(constRetSheetName).Range("L30").Top
+            .ChartArea.left = Sheets(constRetSheetName).Range("L30").left
             .SeriesCollection(1).Name = "=""上"""
             .SeriesCollection(2).Name = "=""右上"""
             .SeriesCollection(3).Name = "=""右"""
@@ -323,8 +348,8 @@ Sub createGraph(ByVal endLine As Long)
             .SetSourceData Source:=Sheets(constDataSheetName).Range(Sheets(constDataSheetName).Cells(constInitDataLine, constAcceXRow), Sheets(constDataSheetName).Cells(rows.Count, constAcceZRow).End(xlUp))
             .ChartArea.Width = 36000
             .ChartArea.Height = 150
-            .ChartArea.Top = Sheets(constRetSheetName).Range("H43").Top
-            .ChartArea.left = Sheets(constRetSheetName).Range("H43").left
+            .ChartArea.Top = Sheets(constRetSheetName).Range("L41").Top
+            .ChartArea.left = Sheets(constRetSheetName).Range("L41").left
             .SeriesCollection(1).Name = "=""Ｘ軸"""
             .SeriesCollection(2).Name = "=""Ｙ軸"""
             .SeriesCollection(3).Name = "=""Ｚ軸"""

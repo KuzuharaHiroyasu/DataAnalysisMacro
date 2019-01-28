@@ -2,6 +2,9 @@ Attribute VB_Name = "Clear"
 Sub Clear()
     Dim cnt As Long
     
+    Application.ScreenUpdating = False
+    Application.Calculation = xlManual
+    
     'グラフ削除'
     If Sheets(constRetSheetName).ChartObjects.Count > 0 Then
         Sheets(constRetSheetName).ChartObjects.Delete
@@ -16,6 +19,14 @@ Sub Clear()
     
     '結果シート'
     Sheets(constRetSheetName).rows(3).Clear
+    Sheets(constRetSheetName).rows(9).Clear
+    Sheets(constRetSheetName).rows(14).Clear
+    Sheets(constRetSheetName).rows(19).Clear
+    Sheets(constRetSheetName).rows(24).Clear
+    Sheets(constRetSheetName).rows(28).Clear
+    Sheets(constRetSheetName).rows(32).Clear
+    Sheets(constRetSheetName).rows(36).Clear
+    Sheets(constRetSheetName).rows(40).Clear
 '    Sheets(constRetSheetName).Range("C3").Clear
 '    Sheets(constRetSheetName).Range("D3").Clear
 '    Sheets(constRetSheetName).Range("E3").Clear
@@ -26,6 +37,9 @@ Sub Clear()
         Sheets(constRetSheetName).rows(cnt).Clear
         cnt = cnt + 1
     Wend
+    
+    Application.Calculation = xlAutomatic
+    Application.ScreenUpdating = True
     
     MsgBox "削除完了しました。"
 End Sub

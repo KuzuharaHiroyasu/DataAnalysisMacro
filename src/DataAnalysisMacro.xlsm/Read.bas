@@ -6,6 +6,8 @@ Sub readData()
     Dim ret As Boolean
     Dim msg As String
     
+    Application.Calculation = xlManual
+    
     '呼吸音'
     If Not readText(ThisWorkbook.Path & "\raw_sum.txt", 2) Then
         msg = "raw_sum.txt "
@@ -17,13 +19,13 @@ Sub readData()
     End If
     
     'いびき状態'
-    If Not readText(ThisWorkbook.Path & "\constSnore__sum.txt", 5) Then
-        msg = msg + "constSnore__sum.txt "
+    If Not readText(ThisWorkbook.Path & "\snore__sum.txt", 5) Then
+        msg = msg + "snore__sum.txt "
     End If
     
     '無呼吸状態'
-    If Not readText(ThisWorkbook.Path & "\constApnea_sum.txt", 6) Then
-        msg = msg + "constApnea_sum.txt "
+    If Not readText(ThisWorkbook.Path & "\apnea_sum.txt", 6) Then
+        msg = msg + "apnea_sum.txt "
     End If
     
     'X軸'
@@ -43,6 +45,8 @@ Sub readData()
     
     Call acceAnalysis
     
+    Application.Calculation = xlAutomatic
+
     If Not msg = "" Then
         msg = msg + "を読み込めませんでした。"
     Else
@@ -55,7 +59,7 @@ End Sub
 '
 'データテキスト読み込み
 '
-Private Function readText(ByVal fileName As String, ByVal inputRow As Long) As Boolean
+Public Function readText(ByVal fileName As String, ByVal inputRow As Long) As Boolean
     Dim a
     Dim inputLine As Long
     
@@ -67,6 +71,7 @@ Private Function readText(ByVal fileName As String, ByVal inputRow As Long) As B
         Do Until EOF(1)
             Line Input #1, buf
             Sheets(constDataSheetName).Cells(inputLine, inputRow) = buf
+            'DoEvents
             inputLine = inputLine + 1
         Loop
         Close #1
@@ -99,6 +104,7 @@ Sub acceAnalysis()
     line = constInitDataLine
     
     While IsEmpty(Sheets(constDataSheetName).Cells(line, constAcceXRow)) = False
+        DoEvents
         x = Sheets(constDataSheetName).Cells(line, constAcceXRow).Value
         y = Sheets(constDataSheetName).Cells(line, constAcceYRow).Value
         z = Sheets(constDataSheetName).Cells(line, constAcceZRow).Value
