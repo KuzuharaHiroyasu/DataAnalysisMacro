@@ -22,9 +22,6 @@ Sub dataAnalysis()
     Dim beforeSnoreState As Integer     '１つ前のいびき判定状態'
     Dim beforeApneaState As Integer     '１つ前の無呼吸判定状態'
     Dim time As Integer                 '経過時間(秒)'
-    Dim breathTime As Integer           '通常呼吸時間'
-    Dim snoreTime As Integer            'いびき時間'
-    Dim apneaTime As Integer            '無呼吸時間'
     Dim snoreCnt As Integer             'いびき回数'
     Dim apneaCnt As Integer             '無呼吸回数'
     Dim startTime As Date               '開始時刻'
@@ -40,9 +37,6 @@ Sub dataAnalysis()
     snoreState = 0
     apneaState = 0
     time = 0
-    breathTime = 0
-    snoreTime = 0
-    apneaTime = 0
     snoreCnt = 0
     apneaCnt = 0
     no = 0
@@ -79,7 +73,7 @@ Sub dataAnalysis()
             End If
             
             'いびきのトータル時間'
-            snoreTime = snoreTime + 10
+            Call setDirectionTime(no, snore)
         ElseIf apneaState = 1 Or apneaState = 2 Then
         '無呼吸判定あり'
             If beforeSnoreState = 1 Then
@@ -96,7 +90,7 @@ Sub dataAnalysis()
             End If
             
             '無呼吸のトータル時間'
-            apneaTime = apneaTime + 10
+            Call setDirectionTime(no, apnea)
         Else
             If beforeApneaState = 1 Or beforeApneaState = 2 Or beforeSnoreState = 1 Then
             '１つ前で無呼吸判定あり、もしくはいびき判定ありだった'
@@ -105,7 +99,7 @@ Sub dataAnalysis()
             End If
             
             '通常呼吸のトータル時間'
-            breathTime = breathTime + 10
+            Call setDirectionTime(no, breath)
         End If
         
         no = no + 1
@@ -118,14 +112,8 @@ Sub dataAnalysis()
         Call setRemarks(retLine, startTime, time, remark, no)
     End If
     
-    
     ''''''各種データ記入''''''
     Call setData(time, startTime, snoreCnt, apneaCnt)
-    
-    '状態別の体の向きの時間'
-    
-    'no×20+20' 'いびき1の行を探す⇒そこのno×20+20行目の向きを求めて加算、最後に該当の箇所に代入'
-    
     
     ''''''加速度センサー''''''
     Dim endLine As Long
@@ -133,12 +121,12 @@ Sub dataAnalysis()
     i = 1
     
     '向き判定の最終行'
-    endLine = Sheets(constDataSheetName).Cells(Rows.Count, constRetAcceRow).End(xlUp).Row
+    endLine = Sheets(constDataSheetName).Cells(rows.Count, constRetAcceRow).End(xlUp).Row
     
     '最終の向きの行数検索'
     While i <= 7
-        If endLine <= Sheets(constDataSheetName).Cells(Rows.Count, constRetAcceRow + i).End(xlUp).Row Then
-            endLine = Sheets(constDataSheetName).Cells(Rows.Count, constRetAcceRow + i).End(xlUp).Row
+        If endLine <= Sheets(constDataSheetName).Cells(rows.Count, constRetAcceRow + i).End(xlUp).Row Then
+            endLine = Sheets(constDataSheetName).Cells(rows.Count, constRetAcceRow + i).End(xlUp).Row
         End If
         i = i + 1
     Wend
@@ -224,7 +212,7 @@ Sub createGraph(ByVal endLine As Long)
     If IsEmpty(Sheets(constDataSheetName).Cells(constInitDataLine, constRawRow)) = False And IsEmpty(Sheets(constDataSheetName).Cells(constInitDataLine, constRawSnoreRow)) = False Then
         With Sheets(constRetSheetName).ChartObjects.Add(30, 50, 300, 200).Chart
             .ChartType = xlLine
-            .SetSourceData Source:=Sheets(constDataSheetName).Range(Sheets(constDataSheetName).Cells(constInitDataLine, constRawRow), Sheets(constDataSheetName).Cells(Rows.Count, constRawSnoreRow).End(xlUp))
+            .SetSourceData Source:=Sheets(constDataSheetName).Range(Sheets(constDataSheetName).Cells(constInitDataLine, constRawRow), Sheets(constDataSheetName).Cells(rows.Count, constRawSnoreRow).End(xlUp))
             .ChartArea.Width = 36000
             .ChartArea.Height = 150
             .ChartArea.Top = Sheets(constRetSheetName).Range("H7").Top
@@ -243,7 +231,7 @@ Sub createGraph(ByVal endLine As Long)
     If IsEmpty(Sheets(constDataSheetName).Cells(constInitDataLine, constSnoreStateRow)) = False And IsEmpty(Sheets(constDataSheetName).Cells(constInitDataLine, constApneaStateRow)) = False Then
         With Sheets(constRetSheetName).ChartObjects.Add(30, 50, 300, 200).Chart
             .ChartType = xlLine
-            .SetSourceData Source:=Sheets(constDataSheetName).Range(Sheets(constDataSheetName).Cells(constInitDataLine, constSnoreStateRow), Sheets(constDataSheetName).Cells(Rows.Count, constApneaStateRow).End(xlUp))
+            .SetSourceData Source:=Sheets(constDataSheetName).Range(Sheets(constDataSheetName).Cells(constInitDataLine, constSnoreStateRow), Sheets(constDataSheetName).Cells(rows.Count, constApneaStateRow).End(xlUp))
             .ChartArea.Width = 36000
             .ChartArea.Height = 150
             .ChartArea.Top = Sheets(constRetSheetName).Range("H19").Top
@@ -287,7 +275,7 @@ Sub createGraph(ByVal endLine As Long)
     If IsEmpty(Sheets(constDataSheetName).Cells(constInitDataLine, constAcceXRow)) = False And IsEmpty(Sheets(constDataSheetName).Cells(constInitDataLine, constAcceYRow)) = False And IsEmpty(Sheets(constDataSheetName).Cells(constInitDataLine, constAcceZRow)) = False Then
         With Sheets(constRetSheetName).ChartObjects.Add(30, 50, 300, 200).Chart
             .ChartType = xlLine
-            .SetSourceData Source:=Sheets(constDataSheetName).Range(Sheets(constDataSheetName).Cells(constInitDataLine, constAcceXRow), Sheets(constDataSheetName).Cells(Rows.Count, constAcceZRow).End(xlUp))
+            .SetSourceData Source:=Sheets(constDataSheetName).Range(Sheets(constDataSheetName).Cells(constInitDataLine, constAcceXRow), Sheets(constDataSheetName).Cells(rows.Count, constAcceZRow).End(xlUp))
             .ChartArea.Width = 36000
             .ChartArea.Height = 150
             .ChartArea.Top = Sheets(constRetSheetName).Range("H43").Top
@@ -304,17 +292,42 @@ Sub createGraph(ByVal endLine As Long)
     End If
 End Sub
 
-Sub setDirectionTime()
+'
+'各状態ごとの各向きの時間を求める
+'
+Sub setDirectionTime(ByVal no As Long, directTime As directionTime)
+    Dim line As Long
+    Dim rows As Integer
+    
+    rows = 10
+    
+    '該当の向きの行'
+    line = (no * 20) + 20
 
-    Select Case str
-        Case "小学生"
-            MsgBox "小学生です"
-        Case "中学生"
-            MsgBox "中学生です"
-        Case "高校生"
-            MsgBox "高校生です"
-        Case Else
-            MsgBox "入力が不正です"
+    '向きを検索'
+    
+    While WorksheetFunction.CountA(Sheets(constDataSheetName).Cells(line, rows)) = 0
+        '空白'
+        rows = rows + 1
+    Wend
+
+    Select Case rows
+        Case 10 'J列(上)'
+            directTime.up = directTime.up + 10
+        Case 11 'K列(右上)'
+            directTime.rightUp = directTime.rightUp + 10
+        Case 12 'L列(右)'
+            directTime.right = directTime.right + 10
+        Case 13 'M列(右下)'
+            directTime.rightDown = directTime.rightDown + 10
+        Case 14 'N列(下)'
+            directTime.down = directTime.down + 10
+        Case 15 'O列(左下)'
+            directTime.leftDown = directTime.leftDown + 10
+        Case 16 'P列(左)'
+            directTime.left = directTime.left + 10
+        Case 17 'Q列(左上)'
+            directTime.leftUp = directTime.leftUp + 10
     End Select
 End Sub
 

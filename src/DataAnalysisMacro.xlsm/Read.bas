@@ -41,6 +41,8 @@ Sub readData()
         msg = msg + "acce_z_sum.txt "
     End If
     
+    Call acceAnalysis
+    
     If Not msg = "" Then
         msg = msg + "を読み込めませんでした。"
     Else
@@ -111,7 +113,7 @@ Sub acceAnalysis()
                 '上側'
                 If x_abs < z_abs Then
                     If (z_abs - x_abs) < 10 Then
-                        '右上(確)'
+                        '上(確)'
                         Sheets(constDataSheetName).Cells(line, constRetAcceRow).Value = 7
                     Else
                         '上(確)'
@@ -119,10 +121,10 @@ Sub acceAnalysis()
                     End If
                 Else
                     If (x_abs - z_abs) < 10 Then
-                        '右上(確)'
+                        '上(確)'
                         Sheets(constDataSheetName).Cells(line, constRetAcceRow).Value = 7
                     Else
-                        '右(確)'
+                        '右上(確)'
                         Sheets(constDataSheetName).Cells(line, constRetAcceRow + 1).Value = 6
                     End If
                 End If
@@ -130,15 +132,15 @@ Sub acceAnalysis()
                 '下側'
                 If x_abs < z_abs Then
                     If (z_abs - x_abs) < 10 Then
-                        '右下(確)'
+                        '右(確)'
                         Sheets(constDataSheetName).Cells(line, constRetAcceRow + 2).Value = 5
                     Else
-                        '下(確)'
+                        '右下(確)'
                         Sheets(constDataSheetName).Cells(line, constRetAcceRow + 3).Value = 4
                     End If
                 Else
                     If (x_abs - z_abs) < 10 Then
-                        '右下(確)'
+                        '右(確)'
                         Sheets(constDataSheetName).Cells(line, constRetAcceRow + 2).Value = 5
                     Else
                         '右(確)'
@@ -152,15 +154,15 @@ Sub acceAnalysis()
                 '上側'
                 If x_abs < z_abs Then
                     If (z_abs - x_abs) < 10 Then
-                        '左上(確)'
+                        '左(確)'
                         Sheets(constDataSheetName).Cells(line, constRetAcceRow + 6).Value = 1
                     Else
-                        '上(確)'
+                        '左上(確)'
                         Sheets(constDataSheetName).Cells(line, constRetAcceRow + 7).Value = 0
                     End If
                 Else
                     If (x_abs - z_abs) < 10 Then
-                        '左上(確)'
+                        '左(確)'
                         Sheets(constDataSheetName).Cells(line, constRetAcceRow + 6).Value = 1
                     Else
                         '左(確)'
@@ -171,7 +173,7 @@ Sub acceAnalysis()
                 '下側'
                 If x_abs < z_abs Then
                     If (z_abs - x_abs) < 10 Then
-                        '左下(確)'
+                        '下(確)'
                         Sheets(constDataSheetName).Cells(line, constRetAcceRow + 4).Value = 3
                     Else
                         '下(確)'
@@ -179,10 +181,10 @@ Sub acceAnalysis()
                     End If
                 Else
                     If (x_abs - z_abs) < 10 Then
-                        '左下(確)'
+                        '下(確)'
                         Sheets(constDataSheetName).Cells(line, constRetAcceRow + 4).Value = 3
                     Else
-                        '左(確)'
+                        '左下(確)'
                         Sheets(constDataSheetName).Cells(line, constRetAcceRow + 5).Value = 2
                     End If
                 End If

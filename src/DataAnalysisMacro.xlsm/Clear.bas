@@ -10,12 +10,12 @@ Sub Clear()
     'データシート'
     cnt = 2 '2行目から'
     While IsEmpty(Sheets(constDataSheetName).Cells(cnt, constRawRow)) = False
-        Sheets(constDataSheetName).Rows(cnt).Clear
+        Sheets(constDataSheetName).rows(cnt).Clear
         cnt = cnt + 1
     Wend
     
     '結果シート'
-    Sheets(constRetSheetName).Rows(3).Clear
+    Sheets(constRetSheetName).rows(3).Clear
 '    Sheets(constRetSheetName).Range("C3").Clear
 '    Sheets(constRetSheetName).Range("D3").Clear
 '    Sheets(constRetSheetName).Range("E3").Clear
@@ -23,7 +23,7 @@ Sub Clear()
 
     cnt = 44    '44行目から'
     While IsEmpty(Sheets(constRetSheetName).Cells(cnt, constRetStartTimeRow)) = False
-        Sheets(constRetSheetName).Rows(cnt).Clear
+        Sheets(constRetSheetName).rows(cnt).Clear
         cnt = cnt + 1
     Wend
     
