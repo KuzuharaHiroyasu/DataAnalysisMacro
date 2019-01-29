@@ -64,7 +64,7 @@ Sub dataAnalysis()
         apneaState = Sheets(constDataSheetName).Cells(dataLine, constApneaStateRow).Value   '–³ŒÄ‹zó‘ÔŽæ“¾'
         
         'ŒÄ‹z‚ÌˆÚ“®•½‹Ï'
-        Call movAverage(dataLine)
+        Call movAverage(dataLine, no)
         
         If snoreState = 1 Then
         '‚¢‚Ñ‚«”»’è‚ ‚è'
@@ -252,7 +252,7 @@ End Sub
 '
 'ˆÚ“®•½‹Ï‚ð‹‚ß‚é
 '
-Sub movAverage(ByVal dataLine As Long)
+Sub movAverage(ByVal dataLine As Long, ByVal no As Long)
     If no >= 4 Then
         Sheets(constDataSheetName).Cells(dataLine, constRawMovAvrRow).Value = WorksheetFunction.Sum(Range(Sheets(constDataSheetName).Cells(dataLine - 4, constRawRow), Sheets(constDataSheetName).Cells(dataLine, constRawRow))) / 5
     Else
