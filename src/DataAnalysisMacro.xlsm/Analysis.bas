@@ -43,6 +43,11 @@ Sub dataAnalysis()
     dataLine = constInitDataLine
     retLine = constInitRetLine
     
+    ''''''‰Šú’lÝ’è''''''
+    '‰ñ”0‰Šú‰»'
+    Sheets(constRetSheetName).Range("B24:H24").Value = 0
+    Sheets(constRetSheetName).Range("B28:H28").Value = 0
+    
     ''''''ŠJŽnŽžÝ’è''''''
     startTime = Sheets(constRetSheetName).Range("B3").Value
     
@@ -119,14 +124,23 @@ Sub dataAnalysis()
     ''''''ŠeŽíƒf[ƒ^‹L“ü''''''
     Call setData(time, startTime, snoreCnt, apneaCnt)
     
-    '’ÊíŒÄ‹z'
-    Call setDirectionTime(breath, 9, 3)
+    'ŠeŒü‚«‚²‚Æ‚Ì’ÊíŒÄ‹z‚ÌŽžŠÔ'
+    Call setDirectionTime(breath, 9, 2)
     
-    '‚¢‚Ñ‚«'
-    Call setDirectionTime(snore, 14, 3)
+    'ŠeŒü‚«‚²‚Æ‚Ì‚¢‚Ñ‚«‚ÌŽžŠÔ'
+    Call setDirectionTime(snore, 14, 2)
     
-    '–³ŒÄ‹z'
-    Call setDirectionTime(apnea, 19, 3)
+    'ŠeŒü‚«‚²‚Æ‚Ì–³ŒÄ‹z‚ÌŽžŠÔ'
+    Call setDirectionTime(apnea, 19, 2)
+    
+    '‡–°ŽžŠÔ‚ÌŠ„‡'
+    Call sleepTimeRatio
+    
+    '‚¢‚Ñ‚«—}§‚ÌŠ„‡'
+    Call perOfSuppression(24, 36, 2, Sheets(constRetSheetName).Range("E3").Value)
+    
+    '–³ŒÄ‹z—}§‚ÌŠ„‡'
+    Call perOfSuppression(28, 40, 2, Sheets(constRetSheetName).Range("F3").Value)
     
     ''''''‰Á‘¬“xƒZƒ“ƒT[''''''
     Dim endLine As Long
@@ -171,15 +185,61 @@ End Sub
 '‚¢‚Ñ‚«E–³ŒÄ‹z‚ÌI—¹ŽžƒZƒbƒg
 '
 Sub setEnd(ByVal retLine As Long, ByVal startTime As Date, ByVal time As Long)
-    Sheets(constRetSheetName).Cells(retLine, constRetStopTimeRow).Value = DateAdd("s", time, startTime)   '’âŽ~ŽžƒZƒbƒg'
+    Dim kind As String
+    Dim duration As Integer
+    
+    '’âŽ~ŽžƒZƒbƒg'
+    Sheets(constRetSheetName).Cells(retLine, constRetStopTimeRow).Value = DateAdd("s", time, startTime)
     Sheets(constRetSheetName).Cells(retLine, constRetStopTimeRow).NumberFormatLocal = "hh:mm:ss"         'Žž‘Ž®Ý’è'
-    Sheets(constRetSheetName).Cells(retLine, constRetContinuTimeRow).Value = Sheets(constRetSheetName).Cells(retLine, constRetStopTimeRow).Value - Sheets(constRetSheetName).Cells(retLine, constRetStartTimeRow).Value   'Œp‘±ŽžŠÔ'
+    
+    'Œp‘±ŽžŠÔƒZƒbƒg'
+    duration = Sheets(constRetSheetName).Cells(retLine, constRetStopTimeRow).Value - Sheets(constRetSheetName).Cells(retLine, constRetStartTimeRow).Value
+    Sheets(constRetSheetName).Cells(retLine, constRetContinuTimeRow).Value = duration
     Sheets(constRetSheetName).Cells(retLine, constRetContinuTimeRow).NumberFormatLocal = "hh:mm:ss"      'Œp‘±ŽžŠÔ‘Ž®Ý’è'
+    
+    'Ä”­Œo‰ßŽžŠÔƒZƒbƒg'
     If retLine = constInitRetLine Then
         Sheets(constRetSheetName).Cells(retLine, constRetStartFromStopTimeRow).Value = "-"
     Else
-        Sheets(constRetSheetName).Cells(retLine, constRetStartFromStopTimeRow).Value = Sheets(constRetSheetName).Cells(retLine, constRetStartTimeRow).Value - Sheets(constRetSheetName).Cells(retLine - 1, constRetStopTimeRow).Value '‘O‰ñ’âŽ~‚©‚ç¡‰ñ”­¶‚Ü‚Å‚ÌŽžŠÔ'
+        Sheets(constRetSheetName).Cells(retLine, constRetStartFromStopTimeRow).Value = Sheets(constRetSheetName).Cells(retLine, constRetStartTimeRow).Value - Sheets(constRetSheetName).Cells(retLine - 1, constRetStopTimeRow).Value
         Sheets(constRetSheetName).Cells(retLine, constRetStartFromStopTimeRow).NumberFormatLocal = "hh:mm:ss" '‘O‰ñ’âŽ~‚©‚ç¡‰ñ”­¶‚Ü‚Å‚ÌŽžŠÔ‘Ž®Ý’è'
+    End If
+    
+    'Œp‘±ŽžŠÔ‚²‚Æ‚É‰ñ”‚ðƒZƒbƒg'
+    'Ží•Ê'
+    kind = Sheets(constRetSheetName).Cells(retLine, constRetTypeRow).Value
+    If kind = "‚¢‚Ñ‚«" Then
+        Call setNumPerDuration(duration, 24)
+    Else
+        Call setNumPerDuration(duration, 28)
+    End If
+End Sub
+
+'
+'Œp‘±ŽžŠÔ‚²‚Æ‚É‰ñ”‚ðƒZƒbƒg
+'
+Sub setNumPerDuration(ByVal duration As Integer, ByVal line As Integer)
+    If duration = 10 Then
+        '10•b'
+        Sheets(constRetSheetName).Cells(2, line).Value = Sheets(constRetSheetName).Cells(2, line).Value + 1
+    ElseIf duration = 20 Then
+        '20•b'
+        Sheets(constRetSheetName).Cells(3, line).Value = Sheets(constRetSheetName).Cells(3, line).Value + 1
+    ElseIf duration >= 30 And duration < 60 Then
+        '30•bˆÈã1•ª–¢–ž'
+        Sheets(constRetSheetName).Cells(4, line).Value = Sheets(constRetSheetName).Cells(4, line).Value + 1
+    ElseIf duration >= 60 And duration < 120 Then
+        '1•ªˆÈã2•ª–¢–ž'
+        Sheets(constRetSheetName).Cells(5, line).Value = Sheets(constRetSheetName).Cells(5, line).Value + 1
+    ElseIf duration >= 120 And duration < 300 Then
+        '2•ªˆÈã5•ª–¢–ž'
+        Sheets(constRetSheetName).Cells(6, line).Value = Sheets(constRetSheetName).Cells(6, line).Value + 1
+    ElseIf duration >= 300 And duration < 600 Then
+        '5•ªˆÈã10•ª–¢–ž'
+        Sheets(constRetSheetName).Cells(7, line).Value = Sheets(constRetSheetName).Cells(7, line).Value + 1
+    Else
+        '10•ªˆÈã'
+        Sheets(constRetSheetName).Cells(8, line).Value = Sheets(constRetSheetName).Cells(8, line).Value + 1
     End If
 End Sub
 
@@ -225,7 +285,8 @@ End Sub
 '
 Sub setDirectionTime(directTime As directionTime, ByVal line As Integer, ByVal row As Integer)
     Dim time As Date
-
+    Dim totalTime As Integer
+    
     'ã'
     time = TimeSerial(0, 0, directTime.up)
     Sheets(constRetSheetName).Cells(line, row).NumberFormatLocal = "hh:mm:ss"
@@ -270,6 +331,13 @@ Sub setDirectionTime(directTime As directionTime, ByVal line As Integer, ByVal r
     
     '¶ã'
     time = TimeSerial(0, 0, directTime.leftUp)
+    Sheets(constRetSheetName).Cells(line, row).NumberFormatLocal = "hh:mm:ss"
+    Sheets(constRetSheetName).Cells(line, row).Value = time
+    row = row + 1
+    
+    '‡Œv'
+    totalTime = directTime.up + directTime.rightUp + directTime.right + directTime.rightDown + directTime.down + directTime.leftDown + directTime.left + directTime.leftUp
+    time = TimeSerial(0, 0, totalTime)
     Sheets(constRetSheetName).Cells(line, row).NumberFormatLocal = "hh:mm:ss"
     Sheets(constRetSheetName).Cells(line, row).Value = time
 End Sub
@@ -400,16 +468,39 @@ Sub calculationDirectionTime(ByVal no As Long, directTime As directionTime)
     End Select
 End Sub
 
+'
+'‡–°ŽžŠÔ‚ÌŠ„‡
+'
+Sub sleepTimeRatio()
+    Dim dataAcqTime As Integer 'ƒf[ƒ^Žæ“¾ŽžŠÔ'
+    
+    dataAcqTime = Sheets(constRetSheetName).Range("D3").Value
+    
+    '’ÊíŒÄ‹z'
+    Sheets(constRetSheetName).Range("B32").Value = Sheets(constRetSheetName).Range("J9").Value / dataAcqTime
+    Sheets(constRetSheetName).Range("B32").NumberFormatLocal = "0.0%"
+    
+    '‚¢‚Ñ‚«'
+    Sheets(constRetSheetName).Range("B33").Value = Sheets(constRetSheetName).Range("J14").Value / dataAcqTime
+    Sheets(constRetSheetName).Range("B33").NumberFormatLocal = "0.0%"
+    
+    '–³ŒÄ‹z'
+    Sheets(constRetSheetName).Range("B34").Value = Sheets(constRetSheetName).Range("J19").Value / dataAcqTime
+    Sheets(constRetSheetName).Range("B34").NumberFormatLocal = "0.0%"
+End Sub
 
-
-
-
-
-
-
-
-
-
+'
+'‚¢‚Ñ‚«E–³ŒÄ‹z—}§‚ÌŠ„‡
+'
+Sub perOfSuppression(ByVal line As Integer, ByVal retLine As Integer, ByVal row As Integer, ByVal totalCnt As Integer)
+    Dim i As Integer
+    '10•b@`@10•ªˆÈã‚Ü‚Å7€–Ú•ª'
+    For i = 1 To 7
+        Sheets(constRetSheetName).Cells(retLine, row).Value = Sheets(constRetSheetName).Cells(line, row).Value / totalCnt
+        Sheets(constRetSheetName).Cells(retLine, row).NumberFormatLocal = "0.0%"
+        row = row + 1
+    Next i
+End Sub
 
 
 
