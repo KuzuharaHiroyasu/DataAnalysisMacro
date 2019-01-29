@@ -186,7 +186,7 @@ End Sub
 '
 Sub setEnd(ByVal retLine As Long, ByVal startTime As Date, ByVal time As Long)
     Dim kind As String
-    Dim duration As Integer
+    Dim duration As Date
     
     '’âŽ~ŽžƒZƒbƒg'
     Sheets(constRetSheetName).Cells(retLine, constRetStopTimeRow).Value = DateAdd("s", time, startTime)
@@ -218,28 +218,33 @@ End Sub
 '
 'Œp‘±ŽžŠÔ‚²‚Æ‚É‰ñ”‚ðƒZƒbƒg
 '
-Sub setNumPerDuration(ByVal duration As Integer, ByVal line As Integer)
-    If duration = 10 Then
+Sub setNumPerDuration(ByVal duration As Date, ByVal line As Integer)
+    Dim durationInt As Integer
+    
+    'Date‚ðInteger‚É•ÏŠ·'
+    durationInt = duration * 86400
+
+    If durationInt = 10 Then
         '10•b'
-        Sheets(constRetSheetName).Cells(2, line).Value = Sheets(constRetSheetName).Cells(2, line).Value + 1
-    ElseIf duration = 20 Then
+        Sheets(constRetSheetName).Cells(line, 2).Value = Sheets(constRetSheetName).Cells(line, 2).Value + 1
+    ElseIf durationInt = 20 Then
         '20•b'
-        Sheets(constRetSheetName).Cells(3, line).Value = Sheets(constRetSheetName).Cells(3, line).Value + 1
-    ElseIf duration >= 30 And duration < 60 Then
+        Sheets(constRetSheetName).Cells(line, 3).Value = Sheets(constRetSheetName).Cells(line, 3).Value + 1
+    ElseIf durationInt >= 30 And durationInt < 60 Then
         '30•bˆÈã1•ª–¢–ž'
-        Sheets(constRetSheetName).Cells(4, line).Value = Sheets(constRetSheetName).Cells(4, line).Value + 1
-    ElseIf duration >= 60 And duration < 120 Then
+        Sheets(constRetSheetName).Cells(line, 4).Value = Sheets(constRetSheetName).Cells(line, 4).Value + 1
+    ElseIf durationInt >= 60 And durationInt < 120 Then
         '1•ªˆÈã2•ª–¢–ž'
-        Sheets(constRetSheetName).Cells(5, line).Value = Sheets(constRetSheetName).Cells(5, line).Value + 1
-    ElseIf duration >= 120 And duration < 300 Then
+        Sheets(constRetSheetName).Cells(line, 5).Value = Sheets(constRetSheetName).Cells(line, 5).Value + 1
+    ElseIf durationInt >= 120 And durationInt < 300 Then
         '2•ªˆÈã5•ª–¢–ž'
-        Sheets(constRetSheetName).Cells(6, line).Value = Sheets(constRetSheetName).Cells(6, line).Value + 1
-    ElseIf duration >= 300 And duration < 600 Then
+        Sheets(constRetSheetName).Cells(line, 6).Value = Sheets(constRetSheetName).Cells(line, 6).Value + 1
+    ElseIf durationInt >= 300 And durationInt < 600 Then
         '5•ªˆÈã10•ª–¢–ž'
-        Sheets(constRetSheetName).Cells(7, line).Value = Sheets(constRetSheetName).Cells(7, line).Value + 1
+        Sheets(constRetSheetName).Cells(line, 7).Value = Sheets(constRetSheetName).Cells(line, 7).Value + 1
     Else
         '10•ªˆÈã'
-        Sheets(constRetSheetName).Cells(8, line).Value = Sheets(constRetSheetName).Cells(8, line).Value + 1
+        Sheets(constRetSheetName).Cells(line, 8).Value = Sheets(constRetSheetName).Cells(line, 8).Value + 1
     End If
 End Sub
 
@@ -472,7 +477,7 @@ End Sub
 '‡–°ŽžŠÔ‚ÌŠ„‡
 '
 Sub sleepTimeRatio()
-    Dim dataAcqTime As Integer 'ƒf[ƒ^Žæ“¾ŽžŠÔ'
+    Dim dataAcqTime As Date 'ƒf[ƒ^Žæ“¾ŽžŠÔ'
     
     dataAcqTime = Sheets(constRetSheetName).Range("D3").Value
     
@@ -481,12 +486,12 @@ Sub sleepTimeRatio()
     Sheets(constRetSheetName).Range("B32").NumberFormatLocal = "0.0%"
     
     '‚¢‚Ñ‚«'
-    Sheets(constRetSheetName).Range("B33").Value = Sheets(constRetSheetName).Range("J14").Value / dataAcqTime
-    Sheets(constRetSheetName).Range("B33").NumberFormatLocal = "0.0%"
+    Sheets(constRetSheetName).Range("C32").Value = Sheets(constRetSheetName).Range("J14").Value / dataAcqTime
+    Sheets(constRetSheetName).Range("C32").NumberFormatLocal = "0.0%"
     
     '–³ŒÄ‹z'
-    Sheets(constRetSheetName).Range("B34").Value = Sheets(constRetSheetName).Range("J19").Value / dataAcqTime
-    Sheets(constRetSheetName).Range("B34").NumberFormatLocal = "0.0%"
+    Sheets(constRetSheetName).Range("D32").Value = Sheets(constRetSheetName).Range("J19").Value / dataAcqTime
+    Sheets(constRetSheetName).Range("D32").NumberFormatLocal = "0.0%"
 End Sub
 
 '

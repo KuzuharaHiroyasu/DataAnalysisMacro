@@ -8,5 +8,10 @@ Sub startReadData()
 End Sub
 
 Sub startDataClear()
-    Clear.Clear
+    Clear.dataClear
 End Sub
+
+Sub startResultClear()
+    Clear.retClear
+End Sub
+
