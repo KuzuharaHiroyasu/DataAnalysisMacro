@@ -163,8 +163,12 @@ Sub dataAnalysis()
     If Sheets(constRetSheetName).ChartObjects.Count > 0 Then
         Sheets(constRetSheetName).ChartObjects.Delete
     End If
+    
     'グラフ作成'
     Call createGraph(endLine)
+    
+    'データを1行にコピー'
+    Call copyData
     
     Application.Calculation = xlAutomatic
     Application.ScreenUpdating = True
@@ -176,9 +180,11 @@ End Sub
 'いびき・無呼吸の開始時刻セット
 '
 Sub setStart(ByVal retLine As Long, ByVal startTime As Date, ByVal time As Long, ByVal kind As String)
+    Sheets(constRetSheetName).Range(Cells(retLine, constRetStartTimeRow), Cells(retLine, constRetRemarkRow)).Font.Size = 10
     Sheets(constRetSheetName).Cells(retLine, constRetStartTimeRow).Value = DateAdd("s", time, startTime)   '開始時刻セット'
     Sheets(constRetSheetName).Cells(retLine, constRetStartTimeRow).NumberFormatLocal = "hh:mm:ss"         '時刻書式設定'
     Sheets(constRetSheetName).Cells(retLine, constRetTypeRow).Value = kind                                '種別セット'
+    Sheets(constRetSheetName).Cells(retLine, constRetTypeRow).HorizontalAlignment = xlCenter
 End Sub
 
 '
@@ -204,6 +210,8 @@ Sub setEnd(ByVal retLine As Long, ByVal startTime As Date, ByVal time As Long)
         Sheets(constRetSheetName).Cells(retLine, constRetStartFromStopTimeRow).Value = Sheets(constRetSheetName).Cells(retLine, constRetStartTimeRow).Value - Sheets(constRetSheetName).Cells(retLine - 1, constRetStopTimeRow).Value
         Sheets(constRetSheetName).Cells(retLine, constRetStartFromStopTimeRow).NumberFormatLocal = "hh:mm:ss" '前回停止から今回発生までの時間書式設定'
     End If
+    Sheets(constRetSheetName).Cells(retLine, constRetStartFromStopTimeRow).HorizontalAlignment = xlRight
+
     
     '継続時間ごとに回数をセット'
     '種別'
@@ -266,6 +274,7 @@ End Sub
 Sub setRemarks(ByVal retLine As Long, ByVal startTime As Date, ByVal time As Long, ByVal remark As Long, ByVal no As Long)
     Call setEnd(retLine, startTime, time)
     Sheets(constRetSheetName).Cells(retLine, constRetRemarkRow).Value = remark & "から" & no
+    Sheets(constRetSheetName).Cells(retLine, constRetRemarkRow).HorizontalAlignment = xlRight
 End Sub
 
 '
@@ -358,15 +367,16 @@ Sub createGraph(ByVal endLine As Long)
             .SetSourceData Source:=Sheets(constDataSheetName).Range(Sheets(constDataSheetName).Cells(constInitDataLine, constRawRow), Sheets(constDataSheetName).Cells(rows.Count, constRawSnoreRow).End(xlUp))
             .ChartArea.Width = 36000
             .ChartArea.Height = 150
-            .ChartArea.Top = Sheets(constRetSheetName).Range("L8").Top
-            .ChartArea.left = Sheets(constRetSheetName).Range("L8").left
-            .SeriesCollection(1).Name = "=""いびき"""
-            .SeriesCollection(2).Name = "=""呼吸音"""
+            .ChartArea.Top = Sheets(constRetSheetName).Range("L7").Top
+            .ChartArea.left = Sheets(constRetSheetName).Range("L7").left
+            .SeriesCollection(1).Name = "=""呼吸音"""
+            .SeriesCollection(2).Name = "=""いびき"""
             .Axes(xlValue).MinimumScale = 0
             .Axes(xlValue).MaximumScale = 1024
             .Axes(xlValue).MajorUnit = 256
             .Axes(xlCategory).HasMajorGridlines = False
             .Axes(xlCategory).TickLabels.NumberFormatLocal = "G/標準"
+            .Legend.Position = xlLegendPositionLeft
         End With
     End If
     
@@ -379,13 +389,14 @@ Sub createGraph(ByVal endLine As Long)
             .ChartArea.Height = 150
             .ChartArea.Top = Sheets(constRetSheetName).Range("L19").Top
             .ChartArea.left = Sheets(constRetSheetName).Range("L19").left
-            .SeriesCollection(1).Name = "=""いびき"""
-            .SeriesCollection(2).Name = "=""無呼吸"""
+            .SeriesCollection(1).Name = "=""無呼吸"""
+            .SeriesCollection(2).Name = "=""いびき"""
             .Axes(xlValue).MinimumScale = 0
             .Axes(xlValue).MaximumScale = 2
             .Axes(xlValue).MajorUnit = 1
             .Axes(xlCategory).HasMajorGridlines = False
             .Axes(xlCategory).TickLabels.NumberFormatLocal = "G/標準"
+            .Legend.Position = xlLegendPositionLeft
         End With
     End If
     
@@ -411,6 +422,7 @@ Sub createGraph(ByVal endLine As Long)
             .Axes(xlValue).MajorUnit = 1
             .Axes(xlCategory).HasMajorGridlines = False
             .Axes(xlCategory).TickLabels.NumberFormatLocal = "G/標準"
+            .Legend.Position = xlLegendPositionLeft
         End With
     End If
     
@@ -431,6 +443,7 @@ Sub createGraph(ByVal endLine As Long)
             .Axes(xlValue).MajorUnit = 50
             .Axes(xlCategory).HasMajorGridlines = False
             .Axes(xlCategory).TickLabels.NumberFormatLocal = "G/標準"
+            .Legend.Position = xlLegendPositionLeft
         End With
     End If
 End Sub
@@ -506,6 +519,54 @@ Sub perOfSuppression(ByVal line As Integer, ByVal retLine As Integer, ByVal row 
         row = row + 1
     Next i
 End Sub
+
+'
+'解析結果コピー
+'
+Sub copyData()
+    Dim line As Integer
+    Dim row As Integer
+    
+    line = 1
+    row = 1
+    
+    Sheets(constRetSheetName).Range("B3:F3").Copy Sheets(constCopySheetName).Cells(line, row)   '開始時刻, 終了時刻, データ取得時間, いびき回数, 無呼吸回数 + 空列
+    row = row + 6
+    
+    Sheets(constRetSheetName).Range("J9").Copy Sheets(constCopySheetName).Cells(line, row)      '通常呼吸時間
+    row = row + 1
+    
+    Sheets(constRetSheetName).Range("J14").Copy Sheets(constCopySheetName).Cells(line, row)     'いびき時間
+    row = row + 1
+    
+    Sheets(constRetSheetName).Range("J19").Copy Sheets(constCopySheetName).Cells(line, row)     '無呼吸時間 + 空列
+    row = row + 2
+    
+    Sheets(constRetSheetName).Range("B24:H24").Copy Sheets(constCopySheetName).Cells(line, row) 'いびき時間（回数）- 10秒, 20秒, 30秒以上1分未満, 1分以上2分未満, 2分以上5分未満, 5分以上10分未満, 10分以上 + 空列
+    row = row + 8
+    
+    Sheets(constRetSheetName).Range("B28:H28").Copy Sheets(constCopySheetName).Cells(line, row) '無呼吸時間（回数）- 10秒, 20秒, 30秒以上1分未満, 1分以上2分未満, 2分以上5分未満, 5分以上10分未満, 10分以上 + 空列
+    row = row + 8
+    
+    Sheets(constRetSheetName).Range("B32:D32").Copy Sheets(constCopySheetName).Cells(line, row) '割合 - 通常呼吸, いびき, 無呼吸 + 空列
+    row = row + 4
+    
+    Sheets(constRetSheetName).Range("B36:H36").Copy Sheets(constCopySheetName).Cells(line, row) 'いびき時間（割合）- 10秒, 20秒, 30秒以上1分未満, 1分以上2分未満, 2分以上5分未満, 5分以上10分未満, 10分以上 + 空列
+    row = row + 8
+    
+    Sheets(constRetSheetName).Range("B40:H40").Copy Sheets(constCopySheetName).Cells(line, row) '無呼吸時間（割合）- 10秒, 20秒, 30秒以上1分未満, 1分以上2分未満, 2分以上5分未満, 5分以上10分未満, 10分以上 + 空列
+    row = row + 8
+    
+    Sheets(constRetSheetName).Range("B9:I9").Copy Sheets(constCopySheetName).Cells(line, row)   '通常呼吸時間 - 上, 右上, 右, 右下, 下, 左下, 左, 左上 + 空列
+    row = row + 9
+    
+    Sheets(constRetSheetName).Range("B9:I9").Copy Sheets(constCopySheetName).Cells(line, row)   'いびき時間 - 上, 右上, 右, 右下, 下, 左下, 左, 左上 + 空列
+    row = row + 9
+    
+    Sheets(constRetSheetName).Range("B9:I9").Copy Sheets(constCopySheetName).Cells(line, row)   '無呼吸時間 - 上, 右上, 右, 右下, 下, 左下, 左, 左上 + 空列
+    row = row + 9
+End Sub
+
 
 
 

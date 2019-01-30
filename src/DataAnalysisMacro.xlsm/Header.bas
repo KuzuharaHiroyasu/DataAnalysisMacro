@@ -9,8 +9,8 @@ Public Const constNoRow = 1                 'Noの列(A列)'
 Public Const constRawRow = 2                '呼吸音の列(B列)'
 Public Const constRawSnoreRow = 3           'いびき音の列(C列)'
 Public Const constRawMovAvrRow = 4          '呼吸音の移動平均の列(D列)'
-Public Const constSnoreStateRow = 5         'いびき判定結果の入った列(E列)'
-Public Const constApneaStateRow = 6         '無呼吸判定結果の入った列(F列)'
+Public Const constApneaStateRow = 5         '無呼吸判定結果の入った列(E列)'
+Public Const constSnoreStateRow = 6         'いびき判定結果の入った列(F列)'
 Public Const constAcceXRow = 7              '加速度(X)の入った列(G列)'
 Public Const constAcceYRow = 8              '加速度(Y)の入った列(H列)'
 Public Const constAcceZRow = 9              '加速度(Z)の入った列(I列)'
@@ -31,3 +31,6 @@ Public Const constRetRemarkRow = 7          '備考の列(F列)'
 '入力文字'
 Public Const constSnore = "いびき"
 Public Const constApnea = "無呼吸"
+
+'コピーシート'
+Public Const constCopySheetName = "copy"     'シート名'

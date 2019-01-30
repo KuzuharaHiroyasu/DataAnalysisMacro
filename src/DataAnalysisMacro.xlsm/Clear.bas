@@ -1,13 +1,13 @@
 Attribute VB_Name = "Clear"
-Sub dataClear()
+Sub retClear()
     Dim cnt As Long
     
     Application.ScreenUpdating = False
     Application.Calculation = xlManual
     
     'グラフ削除'
-    If ChartObjects.Count > 0 Then
-        ChartObjects.Delete
+    If ActiveSheet.ChartObjects.Count > 0 Then
+        ActiveSheet.ChartObjects.Delete
     End If
     
     '結果シート'
@@ -22,7 +22,7 @@ Sub dataClear()
     rows(40).Clear
 
     cnt = 44    '44行目から'
-    While IsEmpty(.Cells(cnt, constRetStartTimeRow)) = False
+    While IsEmpty(Cells(cnt, constRetStartTimeRow)) = False
         rows(cnt).Clear
         cnt = cnt + 1
     Wend
@@ -33,7 +33,7 @@ Sub dataClear()
     MsgBox "削除完了しました。"
 End Sub
 
-Sub retClear()
+Sub dataClear()
     Dim endLine As Long
     
     Application.ScreenUpdating = False

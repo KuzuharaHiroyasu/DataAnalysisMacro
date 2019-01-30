@@ -18,14 +18,14 @@ Sub readData()
         msg = msg + "rawsnore_sum.txt "
     End If
     
-    '‚¢‚Ñ‚«ó‘Ô'
-    If Not readText(ThisWorkbook.Path & "\snore__sum.txt", 5) Then
-        msg = msg + "snore__sum.txt "
+    '–³ŒÄ‹zó‘Ô'
+    If Not readText(ThisWorkbook.Path & "\apnea_sum.txt", 5) Then
+        msg = msg + "apnea_sum.txt "
     End If
     
-    '–³ŒÄ‹zó‘Ô'
-    If Not readText(ThisWorkbook.Path & "\apnea_sum.txt", 6) Then
-        msg = msg + "apnea_sum.txt "
+    '‚¢‚Ñ‚«ó‘Ô'
+    If Not readText(ThisWorkbook.Path & "\snore__sum.txt", 6) Then
+        msg = msg + "snore__sum.txt "
     End If
     
     'X²'
