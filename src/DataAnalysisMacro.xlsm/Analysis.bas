@@ -459,7 +459,12 @@ Sub calculationDirectionTime(ByVal no As Long, directTime As directionTime)
     
     '該当の向きの行'
     line = (no * 20) + 20
-
+    
+    '加速度センサーの値がカラなら上の行の値があるところまで遡る'
+    While WorksheetFunction.CountA(Sheets(constDataSheetName).Cells(line, constAcceXRow)) = 0
+        line = line - 1
+    Wend
+    
     '向きを検索'
     While WorksheetFunction.CountA(Sheets(constDataSheetName).Cells(line, rows)) = 0
         '空白'
