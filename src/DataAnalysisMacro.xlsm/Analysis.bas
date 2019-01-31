@@ -490,7 +490,7 @@ End Sub
 '睡眠時間の割合
 '
 Sub sleepTimeRatio()
-    Dim dataAcqTime As Date 'データ取得時間'
+    Dim dataAcqTime As Variant 'データ取得時間'
     
     dataAcqTime = Sheets(constRetSheetName).Range("D3").Value
     
@@ -560,10 +560,10 @@ Sub copyData()
     Sheets(constRetSheetName).Range("B9:I9").Copy Sheets(constCopySheetName).Cells(line, row)   '通常呼吸時間 - 上, 右上, 右, 右下, 下, 左下, 左, 左上 + 空列
     row = row + 9
     
-    Sheets(constRetSheetName).Range("B9:I9").Copy Sheets(constCopySheetName).Cells(line, row)   'いびき時間 - 上, 右上, 右, 右下, 下, 左下, 左, 左上 + 空列
+    Sheets(constRetSheetName).Range("B14:I14").Copy Sheets(constCopySheetName).Cells(line, row)   'いびき時間 - 上, 右上, 右, 右下, 下, 左下, 左, 左上 + 空列
     row = row + 9
     
-    Sheets(constRetSheetName).Range("B9:I9").Copy Sheets(constCopySheetName).Cells(line, row)   '無呼吸時間 - 上, 右上, 右, 右下, 下, 左下, 左, 左上 + 空列
+    Sheets(constRetSheetName).Range("B19:I19").Copy Sheets(constCopySheetName).Cells(line, row)   '無呼吸時間 - 上, 右上, 右, 右下, 下, 左下, 左, 左上 + 空列
     row = row + 9
 End Sub
 
