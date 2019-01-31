@@ -513,11 +513,18 @@ End Sub
 Sub perOfSuppression(ByVal line As Integer, ByVal retLine As Integer, ByVal row As Integer, ByVal totalCnt As Integer)
     Dim i As Integer
     '10ïbÅ@Å`Å@10ï™à»è„Ç‹Ç≈7çÄñ⁄ï™'
-    For i = 1 To 7
-        Sheets(constRetSheetName).Cells(retLine, row).Value = Sheets(constRetSheetName).Cells(line, row).Value / totalCnt
-        Sheets(constRetSheetName).Cells(retLine, row).NumberFormatLocal = "0.0%"
-        row = row + 1
-    Next i
+    If totalCnt = 0 Then
+        'totalCntÇ™0'
+        Sheets(constRetSheetName).Range(Cells(retLine, row), Cells(retLine, row + 6)).Value = 0
+        Sheets(constRetSheetName).Range(Cells(retLine, row), Cells(retLine, row + 6)).NumberFormatLocal = "0.0%"
+    Else
+        'totalCntÇ™0à»äO'
+        For i = 1 To 7
+            Sheets(constRetSheetName).Cells(retLine, row).Value = Sheets(constRetSheetName).Cells(line, row).Value / totalCnt
+            Sheets(constRetSheetName).Cells(retLine, row).NumberFormatLocal = "0.0%"
+            row = row + 1
+        Next i
+    End If
 End Sub
 
 '

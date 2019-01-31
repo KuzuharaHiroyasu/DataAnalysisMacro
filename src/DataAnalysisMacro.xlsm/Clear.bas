@@ -20,12 +20,18 @@ Sub retClear()
     rows(32).Clear
     rows(36).Clear
     rows(40).Clear
-
+    
+    '睡眠時間の表の枠線を復活させる'
+    Range("B9:J20").BorderAround LineStyle:=xlContinuous
+ 
     cnt = 44    '44行目から'
     While IsEmpty(Cells(cnt, constRetStartTimeRow)) = False
         rows(cnt).Clear
         cnt = cnt + 1
     Wend
+    
+    'copyシートの出力結果削除'
+    Sheets(constCopySheetName).rows(1).Clear
     
     Application.Calculation = xlAutomatic
     Application.ScreenUpdating = True
