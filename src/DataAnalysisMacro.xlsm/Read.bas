@@ -94,9 +94,9 @@ End Sub
 '体の向きを決める
 '
 Sub acceAnalysis()
-    Dim x As Integer                    '加速度センサー_X軸'
-    Dim y As Integer                    '加速度センサー_Y軸'
-    Dim z As Integer                    '加速度センサー_Z軸'
+    Dim x As Long                    '加速度センサー_X軸'
+    Dim y As Long                    '加速度センサー_Y軸'
+    Dim z As Long                    '加速度センサー_Z軸'
     Dim line As Long
     Dim x_abs As Integer
     Dim z_abs As Integer
@@ -108,6 +108,12 @@ Sub acceAnalysis()
         x = Sheets(constDataSheetName).Cells(line, constAcceXRow).Value
         y = Sheets(constDataSheetName).Cells(line, constAcceYRow).Value
         z = Sheets(constDataSheetName).Cells(line, constAcceZRow).Value
+        
+        If x > 200 Or y > 200 Or z > 200 Then
+            'エラー回避(イレギュラーな値)'
+            Sheets(constDataSheetName).Range(Cells(line, constAcceXRow), Cells(line, constAcceZRow)).Delete
+            GoTo Continue
+        End If
         
         x_abs = Abs(x)
         z_abs = Abs(z)
@@ -197,6 +203,7 @@ Sub acceAnalysis()
             End If
         End If
         line = line + 1
+Continue:
     Wend
 End Sub
 
