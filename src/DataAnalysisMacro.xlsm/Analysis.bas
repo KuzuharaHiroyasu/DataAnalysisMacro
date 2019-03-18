@@ -28,6 +28,7 @@ Sub dataAnalysis()
     Dim dataLine As Long                '現在解析中のデータの行'
     Dim retLine As Long                 '現在結果入力中の行'
     Dim no As Long                      'ナンバー'
+    Dim lastNo As Long                  '最終判定ナンバー'
     Dim remark As Long                  '備考用'
     Dim breath As directionTime         '通常呼吸の向き構造体'
     Dim snore As directionTime          'いびきの向き構造体'
@@ -55,70 +56,75 @@ Sub dataAnalysis()
     Application.ScreenUpdating = False
     Application.Calculation = xlManual
     
-    While IsEmpty(Sheets(constDataSheetName).Cells(dataLine, constSnoreStateRow)) = False
+    While IsEmpty(Sheets(constDataSheetName).Cells(dataLine, constRawRow)) = False
         DoEvents
         Sheets(constDataSheetName).Cells(dataLine, constNoRow).Value = no 'ナンバー挿入'
-        beforeSnoreState = snoreState                       '１つ前のいびき判定状態を保存'
-        beforeApneaState = apneaState                       '１つ前の無呼吸判定状態を保存'
-        snoreState = Sheets(constDataSheetName).Cells(dataLine, constSnoreStateRow).Value   'いびき状態取得'
-        apneaState = Sheets(constDataSheetName).Cells(dataLine, constApneaStateRow).Value   '無呼吸状態取得'
         
         '呼吸の移動平均'
         Call movAverage(dataLine, no)
         
-        If snoreState = 1 Then
-        'いびき判定あり'
-            If beforeApneaState = 1 Or beforeApneaState = 2 Then
-            '１つ前で無呼吸判定ありだった'
-                Call setRemarks(retLine, startTime, time, remark, no)
-                retLine = retLine + 1     '結果入力を次の行へ'
-            End If
+        If IsEmpty(Sheets(constDataSheetName).Cells(dataLine, constSnoreStateRow)) = False Then
+            'いびき判定結果が入力されている'
+            beforeSnoreState = snoreState                       '１つ前のいびき判定状態を保存'
+            beforeApneaState = apneaState                       '１つ前の無呼吸判定状態を保存'
+            snoreState = Sheets(constDataSheetName).Cells(dataLine, constSnoreStateRow).Value   'いびき状態取得'
+            apneaState = Sheets(constDataSheetName).Cells(dataLine, constApneaStateRow).Value   '無呼吸状態取得'
         
-            If beforeSnoreState = 0 Then
-            '１つ前はいびき判定なし'
-                Call setStart(retLine, startTime, time, constSnore)
-                snoreCnt = snoreCnt + 1
-                remark = no
-            End If
+            If snoreState = 1 Then
+            'いびき判定あり'
+                If beforeApneaState = 1 Or beforeApneaState = 2 Then
+                '１つ前で無呼吸判定ありだった'
+                    Call setRemarks(retLine, startTime, time, remark, no)
+                    retLine = retLine + 1     '結果入力を次の行へ'
+                End If
             
-            'いびきのトータル時間'
-            Call calculationDirectionTime(no, snore)
-        ElseIf apneaState = 1 Or apneaState = 2 Then
-        '無呼吸判定あり'
-            If beforeSnoreState = 1 Then
-            '１つ前でいびき判定ありだった'
-                Call setRemarks(retLine, startTime, time, remark, no)
-                retLine = retLine + 1     '結果入力を次の行へ'
-            End If
-        
-            If beforeApneaState = 0 Then
-            '１つ前は無呼吸判定なし'
-                Call setStart(retLine, startTime, time, constApnea)
-                apneaCnt = apneaCnt + 1
-                remark = no
-            End If
+                If beforeSnoreState = 0 Then
+                '１つ前はいびき判定なし'
+                    Call setStart(retLine, startTime, time, constSnore)
+                    snoreCnt = snoreCnt + 1
+                    remark = no
+                End If
+                
+                'いびきのトータル時間'
+                Call calculationDirectionTime(no, snore)
+            ElseIf apneaState = 1 Or apneaState = 2 Then
+            '無呼吸判定あり'
+                If beforeSnoreState = 1 Then
+                '１つ前でいびき判定ありだった'
+                    Call setRemarks(retLine, startTime, time, remark, no)
+                    retLine = retLine + 1     '結果入力を次の行へ'
+                End If
             
-            '無呼吸のトータル時間'
-            Call calculationDirectionTime(no, apnea)
-        Else
-            If beforeApneaState = 1 Or beforeApneaState = 2 Or beforeSnoreState = 1 Then
-            '１つ前で無呼吸判定あり、もしくはいびき判定ありだった'
-                Call setRemarks(retLine, startTime, time, remark, no)
-                retLine = retLine + 1     '結果入力を次の行へ'
+                If beforeApneaState = 0 Then
+                '１つ前は無呼吸判定なし'
+                    Call setStart(retLine, startTime, time, constApnea)
+                    apneaCnt = apneaCnt + 1
+                    remark = no
+                End If
+                
+                '無呼吸のトータル時間'
+                Call calculationDirectionTime(no, apnea)
+            Else
+                If beforeApneaState = 1 Or beforeApneaState = 2 Or beforeSnoreState = 1 Then
+                '１つ前で無呼吸判定あり、もしくはいびき判定ありだった'
+                    Call setRemarks(retLine, startTime, time, remark, no)
+                    retLine = retLine + 1     '結果入力を次の行へ'
+                End If
+                
+                '通常呼吸のトータル時間'
+                Call calculationDirectionTime(no, breath)
             End If
-            
-            '通常呼吸のトータル時間'
-            Call calculationDirectionTime(no, breath)
+            time = time + 10    '時間を10秒増やす'
+            lastNo = no + 1
         End If
         
         no = no + 1
-        time = time + 10    '時間を10秒増やす'
         dataLine = dataLine + 1     '次の行のデータ02へ'
     Wend
     
     If IsEmpty(Sheets(constRetSheetName).Cells(retLine, constRetTypeRow).Value) = False Then
         '最後の判定の停止時刻など'
-        Call setRemarks(retLine, startTime, time, remark, no)
+        Call setRemarks(retLine, startTime, time, remark, lastNo)
     End If
     
     ''''''各種データ記入''''''
@@ -271,9 +277,9 @@ End Sub
 '
 '備考欄に記入
 '
-Sub setRemarks(ByVal retLine As Long, ByVal startTime As Date, ByVal time As Long, ByVal remark As Long, ByVal no As Long)
+Sub setRemarks(ByVal retLine As Long, ByVal startTime As Date, ByVal time As Long, ByVal remark As Long, ByVal lastNo As Long)
     Call setEnd(retLine, startTime, time)
-    Sheets(constRetSheetName).Cells(retLine, constRetRemarkRow).Value = remark & "から" & no
+    Sheets(constRetSheetName).Cells(retLine, constRetRemarkRow).Value = remark & "から" & lastNo
     Sheets(constRetSheetName).Cells(retLine, constRetRemarkRow).HorizontalAlignment = xlRight
 End Sub
 
