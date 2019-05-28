@@ -1,4 +1,6 @@
 Attribute VB_Name = "Analysis"
+Private Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal ms As LongPtr)
+
 '
 '各向きの時間用構造体
 '
@@ -59,17 +61,17 @@ Sub dataAnalysis()
     While IsEmpty(Sheets(constDataSheetName).Cells(dataLine, constRawRow)) = False
         DoEvents
         Sheets(constDataSheetName).Cells(dataLine, constNoRow).Value = no 'ナンバー挿入'
-        
+
         '呼吸の移動平均'
         Call movAverage(dataLine, no)
-        
+
         If IsEmpty(Sheets(constDataSheetName).Cells(dataLine, constSnoreStateRow)) = False Then
             'いびき判定結果が入力されている'
             beforeSnoreState = snoreState                       '１つ前のいびき判定状態を保存'
             beforeApneaState = apneaState                       '１つ前の無呼吸判定状態を保存'
             snoreState = Sheets(constDataSheetName).Cells(dataLine, constSnoreStateRow).Value   'いびき状態取得'
             apneaState = Sheets(constDataSheetName).Cells(dataLine, constApneaStateRow).Value   '無呼吸状態取得'
-        
+
             If snoreState = 1 Then
             'いびき判定あり'
                 If beforeApneaState = 1 Or beforeApneaState = 2 Then
@@ -77,14 +79,14 @@ Sub dataAnalysis()
                     Call setRemarks(retLine, startTime, time, remark, no)
                     retLine = retLine + 1     '結果入力を次の行へ'
                 End If
-            
+
                 If beforeSnoreState = 0 Then
                 '１つ前はいびき判定なし'
                     Call setStart(retLine, startTime, time, constSnore)
                     snoreCnt = snoreCnt + 1
                     remark = no
                 End If
-                
+
                 'いびきのトータル時間'
                 Call calculationDirectionTime(no, snore)
             ElseIf apneaState = 1 Or apneaState = 2 Then
@@ -94,14 +96,14 @@ Sub dataAnalysis()
                     Call setRemarks(retLine, startTime, time, remark, no)
                     retLine = retLine + 1     '結果入力を次の行へ'
                 End If
-            
+
                 If beforeApneaState = 0 Then
                 '１つ前は無呼吸判定なし'
                     Call setStart(retLine, startTime, time, constApnea)
                     apneaCnt = apneaCnt + 1
                     remark = no
                 End If
-                
+
                 '無呼吸のトータル時間'
                 Call calculationDirectionTime(no, apnea)
             Else
@@ -110,56 +112,56 @@ Sub dataAnalysis()
                     Call setRemarks(retLine, startTime, time, remark, no)
                     retLine = retLine + 1     '結果入力を次の行へ'
                 End If
-                
+
                 '通常呼吸のトータル時間'
                 Call calculationDirectionTime(no, breath)
             End If
             time = time + 10    '時間を10秒増やす'
             lastNo = no + 1
         End If
-        
+
         no = no + 1
         dataLine = dataLine + 1     '次の行のデータ02へ'
     Wend
-    
+
     If IsEmpty(Sheets(constRetSheetName).Cells(retLine, constRetTypeRow).Value) = False Then
         '最後の判定の停止時刻など'
         Call setRemarks(retLine, startTime, time, remark, lastNo)
     End If
-    
+
     ''''''各種データ記入''''''
     Call setData(time, startTime, snoreCnt, apneaCnt)
-    
+
     '各向きごとの通常呼吸の時間'
     Call setDirectionTime(breath, 9, 2)
-    
+
     '各向きごとのいびきの時間'
     Call setDirectionTime(snore, 14, 2)
-    
+
     '各向きごとの無呼吸の時間'
     Call setDirectionTime(apnea, 19, 2)
-    
+
     '睡眠時間の割合'
     Call sleepTimeRatio
-    
+
     'いびき抑制の割合'
     Call perOfSuppression(24, 36, 2, Sheets(constRetSheetName).Range("E3").Value)
-    
+
     '無呼吸抑制の割合'
     Call perOfSuppression(28, 40, 2, Sheets(constRetSheetName).Range("F3").Value)
-    
+
     ''''''加速度センサー''''''
     Dim endLine As Long
     Dim i As Long
     i = 1
-    
+
     '向き判定の最終行'
-    endLine = Sheets(constDataSheetName).Cells(rows.Count, constRetAcceRow).End(xlUp).row
-    
+    endLine = Sheets(constDataSheetName).Cells(rows.Count, constRetAcceStartRow).End(xlUp).row
+
     '最終の向きの行数検索'
     While i <= 7
-        If endLine <= Sheets(constDataSheetName).Cells(rows.Count, constRetAcceRow + i).End(xlUp).row Then
-            endLine = Sheets(constDataSheetName).Cells(rows.Count, constRetAcceRow + i).End(xlUp).row
+        If endLine <= Sheets(constDataSheetName).Cells(rows.Count, constRetAcceStartRow + i).End(xlUp).row Then
+            endLine = Sheets(constDataSheetName).Cells(rows.Count, constRetAcceStartRow + i).End(xlUp).row
         End If
         i = i + 1
     Wend
@@ -371,21 +373,32 @@ Sub createGraph(ByVal endLine As Long)
         With Sheets(constRetSheetName).ChartObjects.Add(30, 50, 300, 200).Chart
             .ChartType = xlLine
             .SetSourceData Source:=Sheets(constDataSheetName).Range(Sheets(constDataSheetName).Cells(constInitDataLine, constRawRow), Sheets(constDataSheetName).Cells(rows.Count, constRawSnoreRow).End(xlUp))
-            .ChartArea.Width = 36000
-            .ChartArea.Height = 150
             .ChartArea.Top = Sheets(constRetSheetName).Range("L7").Top
             .ChartArea.left = Sheets(constRetSheetName).Range("L7").left
             .SeriesCollection(1).Name = "=""呼吸音"""
             .SeriesCollection(2).Name = "=""いびき"""
+            .Legend.Position = xlLegendPositionLeft
             .Axes(xlValue).MinimumScale = 0
             .Axes(xlValue).MaximumScale = 1024
             .Axes(xlValue).MajorUnit = 256
             .Axes(xlCategory).HasMajorGridlines = False
             .Axes(xlCategory).TickLabels.NumberFormatLocal = "G/標準"
-            .Legend.Position = xlLegendPositionLeft
+            .Axes(xlCategory).MajorTickMark = xlNone
+            .ChartArea.Width = 36000
+            .ChartArea.Height = 150
+            With .PlotArea
+                Application.ScreenUpdating = False
+               .Select
+                With Selection
+                    .left = 69
+                    .Height = 140
+                    .Width = 35940
+                End With
+                Application.ScreenUpdating = True
+            End With
         End With
     End If
-    
+
     'いびき/呼吸の判定'
     If IsEmpty(Sheets(constDataSheetName).Cells(constInitDataLine, constSnoreStateRow)) = False And IsEmpty(Sheets(constDataSheetName).Cells(constInitDataLine, constApneaStateRow)) = False Then
         With Sheets(constRetSheetName).ChartObjects.Add(30, 50, 300, 200).Chart
@@ -403,14 +416,25 @@ Sub createGraph(ByVal endLine As Long)
             .Axes(xlCategory).HasMajorGridlines = False
             .Axes(xlCategory).TickLabels.NumberFormatLocal = "G/標準"
             .Legend.Position = xlLegendPositionLeft
+            With .PlotArea
+                Application.ScreenUpdating = False
+               .Select
+                With Selection
+                    .Width = 50
+                    .left = 96
+                    .Height = 140
+                    .Width = 35940
+                End With
+                Application.ScreenUpdating = True
+            End With
         End With
     End If
-    
+
     '体の向き'
     If endLine > 1 Then
         With Sheets(constRetSheetName).ChartObjects.Add(30, 50, 300, 200).Chart
             .ChartType = xlLine
-            .SetSourceData Source:=Sheets(constDataSheetName).Range(Sheets(constDataSheetName).Cells(constInitDataLine - 1, constRetAcceRow), Sheets(constDataSheetName).Cells(endLine, 17))
+            .SetSourceData Source:=Sheets(constDataSheetName).Range(Sheets(constDataSheetName).Cells(constInitDataLine - 1, constRetAcceStartRow), Sheets(constDataSheetName).Cells(endLine, constRetAcceEndRow))
             .ChartArea.Width = 36000
             .ChartArea.Height = 150
             .ChartArea.Top = Sheets(constRetSheetName).Range("L30").Top
@@ -428,11 +452,23 @@ Sub createGraph(ByVal endLine As Long)
             .Axes(xlValue).MajorUnit = 1
             .Axes(xlCategory).HasMajorGridlines = False
             .Axes(xlCategory).TickLabels.NumberFormatLocal = "G/標準"
+            .Axes(xlCategory).MajorTickMark = xlNone
             .Legend.Position = xlLegendPositionLeft
+            With .PlotArea
+                Application.ScreenUpdating = False
+               .Select
+                With Selection
+                    .Width = 50
+                    .left = 84
+                    .Height = 140
+                    .Width = 35940
+                End With
+                Application.ScreenUpdating = True
+            End With
         End With
     End If
-    
-    'センサー値'
+
+    '加速度センサー値'
     If IsEmpty(Sheets(constDataSheetName).Cells(constInitDataLine, constAcceXRow)) = False And IsEmpty(Sheets(constDataSheetName).Cells(constInitDataLine, constAcceYRow)) = False And IsEmpty(Sheets(constDataSheetName).Cells(constInitDataLine, constAcceZRow)) = False Then
         With Sheets(constRetSheetName).ChartObjects.Add(30, 50, 300, 200).Chart
             .ChartType = xlLine
@@ -449,7 +485,49 @@ Sub createGraph(ByVal endLine As Long)
             .Axes(xlValue).MajorUnit = 50
             .Axes(xlCategory).HasMajorGridlines = False
             .Axes(xlCategory).TickLabels.NumberFormatLocal = "G/標準"
+            .Axes(xlCategory).MajorTickMark = xlNone
             .Legend.Position = xlLegendPositionLeft
+            With .PlotArea
+                Application.ScreenUpdating = False
+               .Select
+                With Selection
+                    .left = 100
+                    .Height = 140
+                    .Width = 35900
+                End With
+                Application.ScreenUpdating = True
+            End With
+        End With
+    End If
+    
+    'フォトセンサー値'
+    If IsEmpty(Sheets(constDataSheetName).Cells(constInitDataLine, constPhotorefRow)) = False Then
+        With Sheets(constRetSheetName).ChartObjects.Add(30, 50, 300, 200).Chart
+            .ChartType = xlLine
+            .SetSourceData Source:=Sheets(constDataSheetName).Range(Sheets(constDataSheetName).Cells(constInitDataLine, constPhotorefRow), Sheets(constDataSheetName).Cells(rows.Count, constPhotorefRow).End(xlUp))
+            .ChartArea.Width = 36000
+            .ChartArea.Height = 150
+            .ChartArea.Top = Sheets(constRetSheetName).Range("L53").Top
+            .ChartArea.left = Sheets(constRetSheetName).Range("L53").left
+            .SeriesCollection(1).Name = "=""ﾌｫﾄｾﾝｻｰ"""
+            .Axes(xlValue).MinimumScale = 0
+            .Axes(xlValue).MaximumScale = 1000
+            .Axes(xlValue).MajorUnit = 200
+            .Axes(xlCategory).HasMajorGridlines = False
+            .Axes(xlCategory).TickLabels.NumberFormatLocal = "G/標準"
+            .Axes(xlCategory).MajorTickMark = xlNone
+            .Legend.Position = xlLegendPositionLeft
+            With .PlotArea
+                Application.ScreenUpdating = False
+               .Select
+                With Selection
+                    .Top = 5
+                    .left = 68
+                    .Height = 140
+                    .Width = 35900
+                End With
+                Application.ScreenUpdating = True
+            End With
         End With
     End If
 End Sub

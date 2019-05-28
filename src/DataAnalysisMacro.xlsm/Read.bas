@@ -9,37 +9,42 @@ Sub readData()
     Application.Calculation = xlManual
     
     '呼吸音'
-    If Not readText(ThisWorkbook.Path & "\raw_sum.txt", 2) Then
+    If Not readText(ThisWorkbook.Path & "\raw_sum.txt", constRawRow) Then
         msg = "raw_sum.txt "
     End If
     
     'いびき音'
-    If Not readText(ThisWorkbook.Path & "\rawsnore_sum.txt", 3) Then
+    If Not readText(ThisWorkbook.Path & "\rawsnore_sum.txt", constRawSnoreRow) Then
         msg = msg + "rawsnore_sum.txt "
     End If
     
     '無呼吸状態'
-    If Not readText(ThisWorkbook.Path & "\apnea_sum.txt", 5) Then
+    If Not readText(ThisWorkbook.Path & "\apnea_sum.txt", constApneaStateRow) Then
         msg = msg + "apnea_sum.txt "
     End If
     
     'いびき状態'
-    If Not readText(ThisWorkbook.Path & "\snore__sum.txt", 6) Then
+    If Not readText(ThisWorkbook.Path & "\snore__sum.txt", constSnoreStateRow) Then
         msg = msg + "snore__sum.txt "
     End If
     
+    'フォトセンサー値'
+    If Not readText(ThisWorkbook.Path & "\photoref_sum.txt", constPhotorefRow) Then
+        msg = msg + "photoref_sum.txt "
+    End If
+    
     'X軸'
-    If Not readText(ThisWorkbook.Path & "\acce_x_sum.txt", 7) Then
+    If Not readText(ThisWorkbook.Path & "\acce_x_sum.txt", constAcceXRow) Then
         msg = msg + "acce_x_sum.txt "
     End If
     
     'Y軸'
-    If Not readText(ThisWorkbook.Path & "\acce_y_sum.txt", 8) Then
+    If Not readText(ThisWorkbook.Path & "\acce_y_sum.txt", constAcceYRow) Then
         msg = msg + "acce_y_sum.txt "
     End If
     
     'Z軸'
-    If Not readText(ThisWorkbook.Path & "\acce_z_sum.txt", 9) Then
+    If Not readText(ThisWorkbook.Path & "\acce_z_sum.txt", constAcceZRow) Then
         msg = msg + "acce_z_sum.txt "
     End If
     
@@ -126,18 +131,18 @@ Sub acceAnalysis()
                 If x_abs < z_abs Then
                     If (z_abs - x_abs) < 10 Then
                         '上(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow).Value = 7
+                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow).Value = 7
                     Else
                         '上(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow).Value = 7
+                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow).Value = 7
                     End If
                 Else
                     If (x_abs - z_abs) < 10 Then
                         '上(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow).Value = 7
+                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow).Value = 7
                     Else
                         '右上(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 1).Value = 6
+                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 1).Value = 6
                     End If
                 End If
             Else
@@ -145,18 +150,18 @@ Sub acceAnalysis()
                 If x_abs < z_abs Then
                     If (z_abs - x_abs) < 10 Then
                         '右(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 2).Value = 5
+                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 2).Value = 5
                     Else
                         '右下(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 3).Value = 4
+                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 3).Value = 4
                     End If
                 Else
                     If (x_abs - z_abs) < 10 Then
                         '右(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 2).Value = 5
+                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 2).Value = 5
                     Else
                         '右(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 2).Value = 5
+                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 2).Value = 5
                     End If
                 End If
             End If
@@ -167,18 +172,18 @@ Sub acceAnalysis()
                 If x_abs < z_abs Then
                     If (z_abs - x_abs) < 10 Then
                         '左(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 6).Value = 1
+                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 6).Value = 1
                     Else
                         '左上(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 7).Value = 0
+                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 7).Value = 0
                     End If
                 Else
                     If (x_abs - z_abs) < 10 Then
                         '左(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 6).Value = 1
+                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 6).Value = 1
                     Else
                         '左(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 6).Value = 1
+                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 6).Value = 1
                     End If
                 End If
             Else
@@ -186,18 +191,18 @@ Sub acceAnalysis()
                 If x_abs < z_abs Then
                     If (z_abs - x_abs) < 10 Then
                         '下(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 4).Value = 3
+                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 4).Value = 3
                     Else
                         '下(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 4).Value = 3
+                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 4).Value = 3
                     End If
                 Else
                     If (x_abs - z_abs) < 10 Then
                         '下(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 4).Value = 3
+                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 4).Value = 3
                     Else
                         '左下(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceRow + 5).Value = 2
+                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 5).Value = 2
                     End If
                 End If
             End If

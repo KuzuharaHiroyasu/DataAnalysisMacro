@@ -1,6 +1,7 @@
 @echo off
 
-cd C:\Project\DataAnalysisMacro
+cd C:\Users\h-kuzuhara\Documents\Project\DataAnalysisMacro
 
 cscript vbac.wsf decombine
 
+pause
