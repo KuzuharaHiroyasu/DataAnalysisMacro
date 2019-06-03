@@ -368,6 +368,7 @@ End Sub
 'ÉOÉâÉtçÏê¨
 '
 Sub createGraph(ByVal endLine As Long)
+    Dim i As Long
 'Ç¢Ç—Ç´/åƒãzÇÃëÂÇ´Ç≥'
     If IsEmpty(Sheets(constDataSheetName).Cells(constInitDataLine, constRawRow)) = False And IsEmpty(Sheets(constDataSheetName).Cells(constInitDataLine, constRawSnoreRow)) = False Then
         With Sheets(constRetSheetName).ChartObjects.Add(30, 50, 300, 200).Chart
@@ -465,6 +466,11 @@ Sub createGraph(ByVal endLine As Long)
                 End With
                 Application.ScreenUpdating = True
             End With
+            With .SeriesCollection
+                For i = 1 To .Count
+                    .Item(i).Format.line.Weight = 3
+                Next i
+            End With
         End With
     End If
 
@@ -497,6 +503,11 @@ Sub createGraph(ByVal endLine As Long)
                 End With
                 Application.ScreenUpdating = True
             End With
+            With .SeriesCollection
+                For i = 1 To .Count
+                    .Item(i).Format.line.Weight = 3
+                Next i
+            End With
         End With
     End If
     
@@ -527,6 +538,11 @@ Sub createGraph(ByVal endLine As Long)
                     .Width = 35900
                 End With
                 Application.ScreenUpdating = True
+            End With
+            With .SeriesCollection
+                For i = 1 To .Count
+                    .Item(i).Format.line.Weight = 3
+                Next i
             End With
         End With
     End If
