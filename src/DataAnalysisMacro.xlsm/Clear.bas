@@ -41,13 +41,26 @@ End Sub
 
 Sub dataClear()
     Dim endLine As Long
+    Dim lineCnt As Long
+
+    endLine = 1
+    lineCnt = 1
     
     Application.ScreenUpdating = False
     Application.Calculation = xlManual
     
     'データシート'
-    endLine = Cells(rows.Count, 2).End(xlUp).row
-    Range(Cells(2, 1), Cells(endLine, 17)).Clear
+    While endLine < 2
+        endLine = Cells(rows.Count, lineCnt).End(xlUp).row
+        If lineCnt > 18 Then
+            endLine = 2
+            GoTo Break
+        End If
+        lineCnt = lineCnt + 1
+    Wend
+
+Break:
+    Range(Cells(2, 1), Cells(endLine, 18)).Clear
     
     Application.Calculation = xlAutomatic
     Application.ScreenUpdating = True
