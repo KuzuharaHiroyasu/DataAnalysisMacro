@@ -63,7 +63,7 @@ Sub dataAnalysis()
         Sheets(constDataSheetName).Cells(dataLine, constNoRow).Value = no 'ÉiÉìÉoÅ[ë}ì¸'
 
         'åƒãzÇÃà⁄ìÆïΩãœ'
-        Call movAverage(dataLine, no)
+'        Call movAverage(dataLine, no)'
 
         If IsEmpty(Sheets(constDataSheetName).Cells(dataLine, constSnoreStateRow)) = False Then
             'Ç¢Ç—Ç´îªíËåãâ Ç™ì¸óÕÇ≥ÇÍÇƒÇ¢ÇÈ'
@@ -369,7 +369,7 @@ End Sub
 '
 Sub createGraph(ByVal endLine As Long)
     Dim i As Long
-'Ç¢Ç—Ç´/åƒãzÇÃëÂÇ´Ç≥'
+    'Ç¢Ç—Ç´/åƒãzÇÃëÂÇ´Ç≥'
     If IsEmpty(Sheets(constDataSheetName).Cells(constInitDataLine, constRawRow)) = False And IsEmpty(Sheets(constDataSheetName).Cells(constInitDataLine, constRawSnoreRow)) = False Then
         With Sheets(constRetSheetName).ChartObjects.Add(30, 50, 300, 200).Chart
             .ChartType = xlLine
@@ -400,6 +400,37 @@ Sub createGraph(ByVal endLine As Long)
         End With
     End If
 
+    'åƒãz/êSîèèúãéå„ÇÃåƒãzÇÃëÂÇ´Ç≥'
+    If IsEmpty(Sheets(constDataSheetName).Cells(constInitDataLine, constRawRow)) = False And IsEmpty(Sheets(constDataSheetName).Cells(constInitDataLine, constRawHBRemovRow)) = False Then
+        With Sheets(constRetSheetName).ChartObjects.Add(30, 50, 300, 200).Chart
+            .ChartType = xlLine
+            .SetSourceData Source:=Sheets(constDataSheetName).Range(Sheets(constDataSheetName).Cells(constInitDataLine, constRawRow), Sheets(constDataSheetName).Cells(rows.Count, constRawHBRemovRow).End(xlUp))
+            .ChartArea.Top = Sheets(constRetSheetName).Range("L19").Top
+            .ChartArea.left = Sheets(constRetSheetName).Range("L19").left
+            .SeriesCollection(1).Name = "=""åƒãzâπ"""
+            .SeriesCollection(2).Name = "=""êSîèèúãéå„"""
+            .Legend.Position = xlLegendPositionLeft
+            .Axes(xlValue).MinimumScale = 0
+            .Axes(xlValue).MaximumScale = 1024
+            .Axes(xlValue).MajorUnit = 256
+            .Axes(xlCategory).HasMajorGridlines = False
+            .Axes(xlCategory).TickLabels.NumberFormatLocal = "G/ïWèÄ"
+            .Axes(xlCategory).MajorTickMark = xlNone
+            .ChartArea.Width = 36000
+            .ChartArea.Height = 150
+            With .PlotArea
+                Application.ScreenUpdating = False
+               .Select
+                With Selection
+                    .left = 69
+                    .Height = 140
+                    .Width = 35940
+                End With
+                Application.ScreenUpdating = True
+            End With
+        End With
+    End If
+    
     'Ç¢Ç—Ç´/åƒãzÇÃîªíË'
     If IsEmpty(Sheets(constDataSheetName).Cells(constInitDataLine, constSnoreStateRow)) = False And IsEmpty(Sheets(constDataSheetName).Cells(constInitDataLine, constApneaStateRow)) = False Then
         With Sheets(constRetSheetName).ChartObjects.Add(30, 50, 300, 200).Chart
@@ -407,8 +438,8 @@ Sub createGraph(ByVal endLine As Long)
             .SetSourceData Source:=Sheets(constDataSheetName).Range(Sheets(constDataSheetName).Cells(constInitDataLine, constSnoreStateRow), Sheets(constDataSheetName).Cells(rows.Count, constApneaStateRow).End(xlUp))
             .ChartArea.Width = 36000
             .ChartArea.Height = 150
-            .ChartArea.Top = Sheets(constRetSheetName).Range("L19").Top
-            .ChartArea.left = Sheets(constRetSheetName).Range("L19").left
+            .ChartArea.Top = Sheets(constRetSheetName).Range("L30").Top
+            .ChartArea.left = Sheets(constRetSheetName).Range("L30").left
             .SeriesCollection(1).Name = "=""ñ≥åƒãz"""
             .SeriesCollection(2).Name = "=""Ç¢Ç—Ç´"""
             .Axes(xlValue).MinimumScale = 0
@@ -438,8 +469,8 @@ Sub createGraph(ByVal endLine As Long)
             .SetSourceData Source:=Sheets(constDataSheetName).Range(Sheets(constDataSheetName).Cells(constInitDataLine - 1, constRetAcceStartRow), Sheets(constDataSheetName).Cells(endLine, constRetAcceEndRow))
             .ChartArea.Width = 36000
             .ChartArea.Height = 150
-            .ChartArea.Top = Sheets(constRetSheetName).Range("L30").Top
-            .ChartArea.left = Sheets(constRetSheetName).Range("L30").left
+            .ChartArea.Top = Sheets(constRetSheetName).Range("L41").Top
+            .ChartArea.left = Sheets(constRetSheetName).Range("L41").left
             .SeriesCollection(1).Name = "=""è„"""
             .SeriesCollection(2).Name = "=""âEè„"""
             .SeriesCollection(3).Name = "=""âE"""
@@ -481,8 +512,8 @@ Sub createGraph(ByVal endLine As Long)
             .SetSourceData Source:=Sheets(constDataSheetName).Range(Sheets(constDataSheetName).Cells(constInitDataLine, constAcceXRow), Sheets(constDataSheetName).Cells(rows.Count, constAcceZRow).End(xlUp))
             .ChartArea.Width = 36000
             .ChartArea.Height = 150
-            .ChartArea.Top = Sheets(constRetSheetName).Range("L41").Top
-            .ChartArea.left = Sheets(constRetSheetName).Range("L41").left
+            .ChartArea.Top = Sheets(constRetSheetName).Range("L53").Top
+            .ChartArea.left = Sheets(constRetSheetName).Range("L53").left
             .SeriesCollection(1).Name = "=""Çwé≤"""
             .SeriesCollection(2).Name = "=""Çxé≤"""
             .SeriesCollection(3).Name = "=""Çyé≤"""
@@ -518,8 +549,8 @@ Sub createGraph(ByVal endLine As Long)
             .SetSourceData Source:=Sheets(constDataSheetName).Range(Sheets(constDataSheetName).Cells(constInitDataLine, constPhotorefRow), Sheets(constDataSheetName).Cells(rows.Count, constPhotorefRow).End(xlUp))
             .ChartArea.Width = 36000
             .ChartArea.Height = 150
-            .ChartArea.Top = Sheets(constRetSheetName).Range("L53").Top
-            .ChartArea.left = Sheets(constRetSheetName).Range("L53").left
+            .ChartArea.Top = Sheets(constRetSheetName).Range("L65").Top
+            .ChartArea.left = Sheets(constRetSheetName).Range("L65").left
             .SeriesCollection(1).Name = "=""Ã´ƒæ›ª∞"""
             .Axes(xlValue).MinimumScale = 0
             .Axes(xlValue).MaximumScale = 1000
