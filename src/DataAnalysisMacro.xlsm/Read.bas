@@ -13,6 +13,11 @@ Sub readData()
         msg = "raw_sum.txt "
     End If
     
+    'S”œ‹Œã‚ÌŒÄ‹z‰¹'
+    If Not readText(ThisWorkbook.Path & "\raw_heartBeatRemov_sum.txt", constRawHBRemovRow) Then
+        msg = "raw_heartBeatRemov_sum.txt "
+    End If
+    
     '‚¢‚Ñ‚«‰¹'
     If Not readText(ThisWorkbook.Path & "\rawsnore_sum.txt", constRawSnoreRow) Then
         msg = msg + "rawsnore_sum.txt "
