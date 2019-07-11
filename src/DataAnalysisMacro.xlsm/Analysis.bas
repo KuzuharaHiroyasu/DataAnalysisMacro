@@ -586,7 +586,7 @@ Sub calculationDirectionTime(ByVal no As Long, directTime As directionTime)
     Dim line As Long
     Dim rows As Integer
     
-    rows = 10
+    rows = constRetAcceStartRow
     
     '該当の向きの行'
     line = (no * 20) + 20
@@ -603,21 +603,21 @@ Sub calculationDirectionTime(ByVal no As Long, directTime As directionTime)
     Wend
 
     Select Case rows
-        Case 10 'J列(上)'
+        Case constRetAcceStartRow 'K列(上)'
             directTime.up = directTime.up + 10
-        Case 11 'K列(右上)'
+        Case constRetAcceStartRow + 1 'L列(右上)'
             directTime.rightUp = directTime.rightUp + 10
-        Case 12 'L列(右)'
+        Case constRetAcceStartRow + 2 'M列(右)'
             directTime.right = directTime.right + 10
-        Case 13 'M列(右下)'
+        Case constRetAcceStartRow + 3 'N列(右下)'
             directTime.rightDown = directTime.rightDown + 10
-        Case 14 'N列(下)'
+        Case constRetAcceStartRow + 4 'O列(下)'
             directTime.down = directTime.down + 10
-        Case 15 'O列(左下)'
+        Case constRetAcceStartRow + 5 'P列(左下)'
             directTime.leftDown = directTime.leftDown + 10
-        Case 16 'P列(左)'
+        Case constRetAcceStartRow + 6 'Q列(左)'
             directTime.left = directTime.left + 10
-        Case 17 'Q列(左上)'
+        Case constRetAcceStartRow + 7 'R列(左上)'
             directTime.leftUp = directTime.leftUp + 10
     End Select
 End Sub
