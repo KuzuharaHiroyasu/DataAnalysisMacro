@@ -125,86 +125,22 @@ Sub acceAnalysis()
         
         'ヘッド部の場所（体の向きではない）'
         If 0 <= x Then
-            '右側'
+            '上or左'
             If 0 <= z Then
-                '上側'
-                If x_abs < z_abs Then
-                    If (z_abs - x_abs) < 10 Then
-                        '上(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow).Value = 7
-                    Else
-                        '上(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow).Value = 7
-                    End If
-                Else
-                    If (x_abs - z_abs) < 10 Then
-                        '上(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow).Value = 7
-                    Else
-                        '右上(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 1).Value = 6
-                    End If
-                End If
+                '左'
+                Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 6).Value = 1
             Else
-                '下側'
-                If x_abs < z_abs Then
-                    If (z_abs - x_abs) < 10 Then
-                        '右(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 2).Value = 5
-                    Else
-                        '右下(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 3).Value = 4
-                    End If
-                Else
-                    If (x_abs - z_abs) < 10 Then
-                        '右(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 2).Value = 5
-                    Else
-                        '右(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 2).Value = 5
-                    End If
-                End If
+                '上'
+                Sheets(constDataSheetName).Cells(line, constRetAcceStartRow).Value = 7
             End If
         Else
-            '左側'
+            '下or右'
             If 0 <= z Then
-                '上側'
-                If x_abs < z_abs Then
-                    If (z_abs - x_abs) < 10 Then
-                        '左(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 6).Value = 1
-                    Else
-                        '左上(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 7).Value = 0
-                    End If
-                Else
-                    If (x_abs - z_abs) < 10 Then
-                        '左(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 6).Value = 1
-                    Else
-                        '左(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 6).Value = 1
-                    End If
-                End If
+                '下'
+                Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 4).Value = 3
             Else
-                '下側'
-                If x_abs < z_abs Then
-                    If (z_abs - x_abs) < 10 Then
-                        '下(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 4).Value = 3
-                    Else
-                        '下(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 4).Value = 3
-                    End If
-                Else
-                    If (x_abs - z_abs) < 10 Then
-                        '下(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 4).Value = 3
-                    Else
-                        '左下(確)'
-                        Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 5).Value = 2
-                    End If
-                End If
+                '右'
+                Sheets(constDataSheetName).Cells(line, constRetAcceStartRow + 2).Value = 5
             End If
         End If
         line = line + 1
