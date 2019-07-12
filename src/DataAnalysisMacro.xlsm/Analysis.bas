@@ -57,7 +57,7 @@ Sub dataAnalysis()
     ''''''解析''''''
     Application.ScreenUpdating = False
     Application.Calculation = xlManual
-    
+
     While IsEmpty(Sheets(constDataSheetName).Cells(dataLine, constRawRow)) = False
         DoEvents
         Sheets(constDataSheetName).Cells(dataLine, constNoRow).Value = no 'ナンバー挿入'
@@ -165,13 +165,13 @@ Sub dataAnalysis()
         End If
         i = i + 1
     Wend
-    
+
     ''''''グラフ作成''''''
     '既にグラフがあれば一旦削除'
     If Sheets(constRetSheetName).ChartObjects.Count > 0 Then
         Sheets(constRetSheetName).ChartObjects.Delete
     End If
-    
+
     'グラフ作成'
     Call createGraph(endLine)
     
@@ -373,7 +373,8 @@ Sub createGraph(ByVal endLine As Long)
     If IsEmpty(Sheets(constDataSheetName).Cells(constInitDataLine, constRawRow)) = False And IsEmpty(Sheets(constDataSheetName).Cells(constInitDataLine, constRawSnoreRow)) = False Then
         With Sheets(constRetSheetName).ChartObjects.Add(30, 50, 300, 200).Chart
             .ChartType = xlLine
-            .SetSourceData Source:=Sheets(constDataSheetName).Range(Sheets(constDataSheetName).Cells(constInitDataLine, constRawRow), Sheets(constDataSheetName).Cells(rows.Count, constRawSnoreRow).End(xlUp))
+            .SetSourceData Source:=Sheets(constDataSheetName).Range(Sheets(constDataSheetName).Cells(constInitDataLine, constRawRow), Sheets(constDataSheetName).Cells(rows.Count, constRawRow).End(xlUp))
+            .SeriesCollection.Add Source:=Sheets(constDataSheetName).Range(Sheets(constDataSheetName).Cells(constInitDataLine, constRawSnoreRow), Sheets(constDataSheetName).Cells(rows.Count, constRawSnoreRow).End(xlUp))
             .ChartArea.Top = Sheets(constRetSheetName).Range("L7").Top
             .ChartArea.left = Sheets(constRetSheetName).Range("L7").left
             .SeriesCollection(1).Name = "=""呼吸音"""
