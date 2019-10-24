@@ -23,7 +23,7 @@ Sub dataAnalysis()
     Dim apneaState As Integer           '無呼吸判定状態'
     Dim beforeSnoreState As Integer     '１つ前のいびき判定状態'
     Dim beforeApneaState As Integer     '１つ前の無呼吸判定状態'
-    Dim time As Integer                 '経過時間(秒)'
+    Dim time As Long                    '経過時間(秒)'
     Dim snoreCnt As Integer             'いびき回数'
     Dim apneaCnt As Integer             '無呼吸回数'
     Dim startTime As Date               '開始時刻'
@@ -58,7 +58,7 @@ Sub dataAnalysis()
     Application.ScreenUpdating = False
     Application.Calculation = xlManual
 
-    While IsEmpty(Sheets(constDataSheetName).Cells(dataLine, constRawRow)) = False
+    While IsEmpty(Sheets(constDataSheetName).Cells(dataLine, constApneaStateRow)) = False
         DoEvents
         Sheets(constDataSheetName).Cells(dataLine, constNoRow).Value = no 'ナンバー挿入'
 
@@ -88,7 +88,7 @@ Sub dataAnalysis()
                 End If
 
                 'いびきのトータル時間'
-                Call calculationDirectionTime(no, snore)
+                Call calculationDirectionTime(no, dataLine, snore)
             ElseIf apneaState = 1 Or apneaState = 2 Then
             '無呼吸判定あり'
                 If beforeSnoreState = 1 Then
@@ -105,7 +105,7 @@ Sub dataAnalysis()
                 End If
 
                 '無呼吸のトータル時間'
-                Call calculationDirectionTime(no, apnea)
+                Call calculationDirectionTime(no, dataLine, apnea)
             Else
                 If beforeApneaState = 1 Or beforeApneaState = 2 Or beforeSnoreState = 1 Then
                 '１つ前で無呼吸判定あり、もしくはいびき判定ありだった'
@@ -114,7 +114,7 @@ Sub dataAnalysis()
                 End If
 
                 '通常呼吸のトータル時間'
-                Call calculationDirectionTime(no, breath)
+                Call calculationDirectionTime(no, dataLine, breath)
             End If
             time = time + 10    '時間を10秒増やす'
             lastNo = no + 1
@@ -124,10 +124,10 @@ Sub dataAnalysis()
         dataLine = dataLine + 1     '次の行のデータ02へ'
     Wend
 
-    If IsEmpty(Sheets(constRetSheetName).Cells(retLine, constRetTypeRow).Value) = False Then
-        '最後の判定の停止時刻など'
-        Call setRemarks(retLine, startTime, time, remark, lastNo)
-    End If
+'    If IsEmpty(Sheets(constRetSheetName).Cells(retLine, constRetTypeRow).Value) = False Then
+'        '最後の判定の停止時刻など'
+'        Call setRemarks(retLine, startTime, time, remark, lastNo)
+'    End If
 
     ''''''各種データ記入''''''
     Call setData(time, startTime, snoreCnt, apneaCnt)
@@ -150,30 +150,30 @@ Sub dataAnalysis()
     '無呼吸抑制の割合'
     Call perOfSuppression(28, 40, 2, Sheets(constRetSheetName).Range("F3").Value)
 
-    ''''''加速度センサー''''''
-    Dim endLine As Long
-    Dim i As Long
-    i = 1
-
-    '向き判定の最終行'
-    endLine = Sheets(constDataSheetName).Cells(rows.Count, constRetAcceStartRow).End(xlUp).row
-
-    '最終の向きの行数検索'
-    While i <= 7
-        If endLine <= Sheets(constDataSheetName).Cells(rows.Count, constRetAcceStartRow + i).End(xlUp).row Then
-            endLine = Sheets(constDataSheetName).Cells(rows.Count, constRetAcceStartRow + i).End(xlUp).row
-        End If
-        i = i + 1
-    Wend
-
-    ''''''グラフ作成''''''
-    '既にグラフがあれば一旦削除'
-    If Sheets(constRetSheetName).ChartObjects.Count > 0 Then
-        Sheets(constRetSheetName).ChartObjects.Delete
-    End If
-
-    'グラフ作成'
-    Call createGraph(endLine)
+'    ''''''加速度センサー''''''
+'    Dim endLine As Long
+'    Dim i As Long
+'    i = 1
+'
+'    '向き判定の最終行'
+'    endLine = Sheets(constDataSheetName).Cells(rows.Count, constRetAcceStartRow).End(xlUp).row
+'
+'    '最終の向きの行数検索'
+'    While i <= 7
+'        If endLine <= Sheets(constDataSheetName).Cells(rows.Count, constRetAcceStartRow + i).End(xlUp).row Then
+'            endLine = Sheets(constDataSheetName).Cells(rows.Count, constRetAcceStartRow + i).End(xlUp).row
+'        End If
+'        i = i + 1
+'    Wend
+'
+'    ''''''グラフ作成''''''
+'    '既にグラフがあれば一旦削除'
+'    If Sheets(constRetSheetName).ChartObjects.Count > 0 Then
+'        Sheets(constRetSheetName).ChartObjects.Delete
+'    End If
+'
+'    'グラフ作成'
+'    Call createGraph(endLine)
     
     'データを1行にコピー'
     Call copyData
@@ -181,14 +181,14 @@ Sub dataAnalysis()
     Application.Calculation = xlAutomatic
     Application.ScreenUpdating = True
     
-    MsgBox "完了しました。"
+    'MsgBox "完了しました。"
 End Sub
 
 '
 'いびき・無呼吸の開始時刻セット
 '
 Sub setStart(ByVal retLine As Long, ByVal startTime As Date, ByVal time As Long, ByVal kind As String)
-    Sheets(constRetSheetName).Range(Cells(retLine, constRetStartTimeRow), Cells(retLine, constRetRemarkRow)).Font.Size = 10
+'    Sheets(constRetSheetName).Range(Cells(retLine, constRetStartTimeRow), Cells(retLine, constRetRemarkRow)).Font.Size = 10
     Sheets(constRetSheetName).Cells(retLine, constRetStartTimeRow).Value = DateAdd("s", time, startTime)   '開始時刻セット'
     Sheets(constRetSheetName).Cells(retLine, constRetStartTimeRow).NumberFormatLocal = "hh:mm:ss"         '時刻書式設定'
     Sheets(constRetSheetName).Cells(retLine, constRetTypeRow).Value = kind                                '種別セット'
@@ -583,22 +583,22 @@ End Sub
 '
 '各状態ごとの各向きの時間を求める
 '
-Sub calculationDirectionTime(ByVal no As Long, directTime As directionTime)
-    Dim line As Long
+Sub calculationDirectionTime(ByVal no As Long, ByVal dataLine As Long, directTime As directionTime)
+'    Dim line As Long
     Dim rows As Integer
     
     rows = constRetAcceStartRow
     
     '該当の向きの行'
-    line = (no * 20) + 20
+'    line = (no * 20) + 20
     
     '加速度センサーの値がカラなら上の行の値があるところまで遡る'
-    While WorksheetFunction.CountA(Sheets(constDataSheetName).Cells(line, constAcceXRow)) = 0
-        line = line - 1
-    Wend
+'    While WorksheetFunction.CountA(Sheets(constDataSheetName).Cells(line, constAcceXRow)) = 0
+'        line = line - 1
+'    Wend
     
     '向きを検索'
-    While WorksheetFunction.CountA(Sheets(constDataSheetName).Cells(line, rows)) = 0
+    While WorksheetFunction.CountA(Sheets(constDataSheetName).Cells(dataLine, rows)) = 0
         '空白'
         rows = rows + 1
     Wend
@@ -673,6 +673,10 @@ Sub copyData()
     
     line = 1
     row = 1
+    
+    Do While Len(Sheets(constCopySheetName).Cells(line, 1)) > 0
+        line = line + 1
+    Loop
     
     Sheets(constRetSheetName).Range("B3:F3").Copy Sheets(constCopySheetName).Cells(line, row)   '開始時刻, 終了時刻, データ取得時間, いびき回数, 無呼吸回数 + 空列
     row = row + 6

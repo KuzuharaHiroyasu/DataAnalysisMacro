@@ -37,3 +37,5 @@ Public Const constApnea = "無呼吸"
 
 'コピーシート'
 Public Const constCopySheetName = "copy"     'シート名'
+
+

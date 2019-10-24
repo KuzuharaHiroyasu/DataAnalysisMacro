@@ -6,37 +6,37 @@ Sub retClear()
     Application.Calculation = xlManual
     
     'グラフ削除'
-    If ActiveSheet.ChartObjects.Count > 0 Then
-        ActiveSheet.ChartObjects.Delete
+    If Sheets(constRetSheetName).ChartObjects.Count > 0 Then
+        Sheets(constRetSheetName).ChartObjects.Delete
     End If
     
     '結果シート'
-    rows(3).Clear
-    rows(9).Clear
-    rows(14).Clear
-    rows(19).Clear
-    rows(24).Clear
-    rows(28).Clear
-    rows(32).Clear
-    rows(36).Clear
-    rows(40).Clear
+    Sheets(constRetSheetName).rows(3).Clear
+    Sheets(constRetSheetName).rows(9).Clear
+    Sheets(constRetSheetName).rows(14).Clear
+    Sheets(constRetSheetName).rows(19).Clear
+    Sheets(constRetSheetName).rows(24).Clear
+    Sheets(constRetSheetName).rows(28).Clear
+    Sheets(constRetSheetName).rows(32).Clear
+    Sheets(constRetSheetName).rows(36).Clear
+    Sheets(constRetSheetName).rows(40).Clear
     
     '睡眠時間の表の枠線を復活させる'
-    Range("B9:J20").BorderAround LineStyle:=xlContinuous
+    Sheets(constRetSheetName).Range("B9:J20").BorderAround LineStyle:=xlContinuous
  
     cnt = 44    '44行目から'
-    While IsEmpty(Cells(cnt, constRetStartTimeRow)) = False
-        rows(cnt).Clear
+    While IsEmpty(Sheets(constRetSheetName).Cells(cnt, constRetStartTimeRow)) = False
+        Sheets(constRetSheetName).rows(cnt).Clear
         cnt = cnt + 1
     Wend
     
     'copyシートの出力結果削除'
-    Sheets(constCopySheetName).rows(1).Clear
+'    Sheets(constCopySheetName).rows(1).Clear
     
     Application.Calculation = xlAutomatic
     Application.ScreenUpdating = True
     
-    MsgBox "削除完了しました。"
+    'MsgBox "削除完了しました。"
 End Sub
 
 Sub dataClear()
@@ -65,5 +65,5 @@ Break:
     Application.Calculation = xlAutomatic
     Application.ScreenUpdating = True
     
-    MsgBox "削除完了しました。"
+'    MsgBox "削除完了しました。"
 End Sub
