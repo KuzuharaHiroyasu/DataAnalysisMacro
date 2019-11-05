@@ -394,8 +394,11 @@ Sub perOfSuppression(ByVal line As Integer, ByVal retLine As Integer, ByVal row 
     '10•b@`@10•ªˆÈã‚Ü‚Å7€–Ú•ª'
     If totalCnt = 0 Then
         'totalCnt‚ª0'
-        Sheets(constRetSheetName).Range(Cells(retLine, row), Cells(retLine, row + 6)).Value = 0
-        Sheets(constRetSheetName).Range(Cells(retLine, row), Cells(retLine, row + 6)).NumberFormatLocal = "0.0%"
+        For i = 1 To 7
+            Sheets(constRetSheetName).Cells(retLine, row).Value = Sheets(constRetSheetName).Cells(line, row).Value
+            Sheets(constRetSheetName).Cells(retLine, row).NumberFormatLocal = "0.0%"
+            row = row + 1
+        Next i
     Else
         'totalCnt‚ª0ˆÈŠO'
         For i = 1 To 7
