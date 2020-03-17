@@ -10,8 +10,10 @@ Sub readData()
     Dim fileName As String
     Dim sheetNameCSV As String
     Dim Path As String
-    
+    Dim del As String
+     
     Application.Calculation = xlManual
+    del = ".csv"
     
     'パス取得'
     Path = ThisWorkbook.Path + "\"
@@ -21,7 +23,7 @@ Sub readData()
     
     Do While Len(fileName) > 0
         'シート名取得'
-        sheetNameCSV = left(fileName, 14)
+        sheetNameCSV = left(fileName, InStr(fileName, del) - 1)
         
         'コピー元のシートがあるファイルを開く
         Workbooks.Open (Path + fileName)
